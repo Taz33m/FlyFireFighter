@@ -106,7 +106,12 @@ export function useCommanderConsole({ state, send, commanderId, rail }: Options)
     const target = JSON.parse(imageSpecKey) as ScreenSpec;
     deviceImage(target).then(
       image => { if (live) session.current?.show({ ...screenRef.current, image: { ...image, verify: target.kind === "pending" } }); },
-      () => { if (live) session.current?.show(screenRef.current); },
+      (cause: unknown) => {
+        if (!live) return;
+        noteId.current += 1;
+        setNote({ text: `Could not render the device screen: ${cause instanceof Error ? cause.message : String(cause)}`, id: noteId.current });
+        session.current?.show(screenRef.current);
+      },
     );
     return () => { live = false; };
   }, [imagesOn, imageSpecKey, device]);
@@ -152,7 +157,8 @@ export function useCommanderConsole({ state, send, commanderId, rail }: Options)
     void (async () => {
       try {
         const port = await requestConsolePort(serial);
-        const next = new ConsoleSession(webSerialTransport(port), {
+        const readError = (message: string) => { noteId.current += 1; setNote({ text: `Serial read: ${message}`, id: noteId.current }); };
+        const next = new ConsoleSession(webSerialTransport(port, readError), {
           now: () => performance.now(),
           onGesture,
           onChange: snap => {

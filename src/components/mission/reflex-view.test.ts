@@ -16,7 +16,7 @@ import { DEFAULT_COMMAND_CONFIG, ReflexCommandMapper } from "../../lib/navigatio
 import { FRAME_STATUS } from "../../lib/navigation/reflex/flow-baseline.ts";
 import {
   calloutText, describeMove, harnessCallouts, MOVE_DIAGRAM, modeCallout, moveGeometry, primaryCallout, provenanceNote,
-  REFLEX_MODES, sectorBands, sectorReading, sectorSummary, sectorTitle, speedRadius, stepMode,
+  REFLEX_MODES, WAITING_FOR_FRAME, sectorBands, sectorReading, sectorSummary, sectorTitle, speedRadius, stepMode,
 } from "./reflex-view.ts";
 
 const source = (relative: string) => readFileSync(fileURLToPath(new URL(relative, import.meta.url)), "utf8");
@@ -186,6 +186,14 @@ describe("left / centre / right sector readings", () => {
       assert.deepEqual(reading.levels, [0, 0, 0]);
       assert.ok(reading.note);
     }
+  });
+
+  test("before any features arrive the panel says it is waiting for a frame; features without sectors are a gap", () => {
+    for (const features of [undefined, null, {}]) assert.equal(sectorReading(features).note, WAITING_FOR_FRAME);
+    const gap = sectorReading({ modelForwardMps: 0.5 });
+    assert.equal(gap.note, "No sector motion reported.");
+    assert.equal(sectorSummary(sectorReading(null)), WAITING_FOR_FRAME);
+    assert.equal(sectorTitle(sectorReading(null), 0), WAITING_FOR_FRAME);
   });
 
   test("NaN and infinite values never light a sector", () => {

@@ -21,7 +21,7 @@ export interface SerialPortInfoLike {
 }
 
 export interface SerialPortLike {
-  open(options: { readonly baudRate: number }): Promise<void>;
+  open(options: { readonly baudRate: number; readonly bufferSize?: number }): Promise<void>;
   close(): Promise<void>;
   getInfo(): SerialPortInfoLike;
   readonly readable: ReadableStream<Uint8Array> | null;
@@ -51,10 +51,20 @@ export async function requestConsolePort(serial: SerialLike): Promise<SerialPort
   return port;
 }
 
-export function webSerialTransport(port: SerialPortLike): ConsoleTransport {
+/**
+ * Web Serial's default receive buffer is 255 bytes. A legacy readback streams a 153,624-byte screen at USB speed,
+ * which overruns it: Chrome then fails the read with BufferOverrunError. The Node relay used for the hardware check
+ * had a large OS buffer, so it never saw this. 1 MiB holds several whole screens.
+ */
+export const RECEIVE_BUFFER_BYTES = 1 << 20;
+
+/** Read errors after which Web Serial keeps the port open and offers a fresh readable stream. */
+const RECOVERABLE_READ_ERRORS = new Set(["BufferOverrunError", "BreakError", "FramingError", "ParityError"]);
+
+export function webSerialTransport(port: SerialPortLike, onReadError?: (message: string) => void): ConsoleTransport {
   let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
   return {
-    open: options => port.open(options),
+    open: options => port.open({ ...options, bufferSize: RECEIVE_BUFFER_BYTES }),
     async *chunks() {
       while (port.readable !== null) {
         reader = port.readable.getReader();
@@ -64,6 +74,12 @@ export function webSerialTransport(port: SerialPortLike): ConsoleTransport {
             if (done) return;
             if (value !== undefined) yield value;
           }
+        } catch (error) {
+          // A non-fatal error loses some bytes but not the port: report it and keep reading (a transfer in
+          // progress then fails its own checks and is retried or falls back), instead of ending the session.
+          const name = error instanceof DOMException ? error.name : "";
+          if (!RECOVERABLE_READ_ERRORS.has(name)) throw error;
+          onReadError?.(`${name} while reading`);
         } finally {
           reader.releaseLock();
           reader = null;

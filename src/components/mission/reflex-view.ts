@@ -212,6 +212,9 @@ function flowReading(features: Readonly<Record<string, number>>): SectorReading 
   return measuredReading("flow", values, values);
 }
 
+/** Shown before the controller has reported any features (no camera frame processed yet). */
+export const WAITING_FOR_FRAME = "Waiting for the first camera frame.";
+
 /**
  * Left / centre / right motion from the controller's reported features. FlyVis sectors (engineered readout) give the
  * magnitude of each sector's horizontal motion; the optical-flow baseline gives outward flow in the left and right
@@ -221,7 +224,8 @@ export function sectorReading(features: Readonly<Record<string, number>> | null 
   const f = features ?? {};
   if (read(f, "leftMotion") !== undefined || read(f, "rightMotion") !== undefined) return flyvisReading(f);
   if (read(f, "flowLeftHz") !== undefined || read(f, "flowRightHz") !== undefined) return flowReading(f);
-  return unmeasured(null, "No sector motion reported.");
+  // Nothing at all yet is the normal start of a run; features without sector values are a real gap.
+  return unmeasured(null, Object.keys(f).length === 0 ? WAITING_FOR_FRAME : "No sector motion reported.");
 }
 
 export const SECTOR_LETTERS: Triple<string> = ["L", "C", "R"];
@@ -254,7 +258,7 @@ function imageDirection(signed: number | null): string {
 /** Tooltip for one sector meter. */
 export function sectorTitle(reading: SectorReading, index: 0 | 1 | 2): string {
   const meta = sectorMeta(reading.source);
-  if (meta === null) return "No sector motion reported.";
+  if (meta === null) return reading.note ?? "No sector motion reported.";
   const value = reading.values[index];
   if (value === null) return `${meta.sectors[index]}: not measured this step.`;
   const direction = reading.source === "flyvis" ? imageDirection(reading.signed[index]) : "";

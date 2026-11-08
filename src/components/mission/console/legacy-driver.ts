@@ -55,7 +55,7 @@ export const SLOW_SHOW_MS = 150;
 export const SHOW_ACK_TIMEOUT_MS = 2000;
 export const TRANSFER_STEP_TIMEOUT_MS = 8000;
 /** Consecutive transfer failures after which images are given up for this connection (text only). */
-export const MAX_FAILURES = 3;
+export const MAX_FAILURES = 4;
 export const BUTTON_STREAM_MS = 50;
 
 type Phase = "put_handshake" | "put_final" | "get_handshake" | "get_raw" | "get_final";
@@ -79,6 +79,7 @@ export class LegacyDriver {
   private desired: LegacyScreen | null = null;
   private dirty = false;
   private preloadNames = new Set<string>();
+  private readonly attempts = new Map<string, number>();
   imagesDisabled = false;
 
   constructor(host: LegacyHost) {
@@ -261,8 +262,12 @@ export class LegacyDriver {
   private fail(reason: string): void {
     const t = this.transfer;
     if (t === null) return;
-    this.failedNames.add(t.image.name);
+    // One retry per screen (a lost burst of bytes is transient); a second failure gives that screen up.
+    const tries = (this.attempts.get(t.image.name) ?? 0) + 1;
+    this.attempts.set(t.image.name, tries);
     this.failures++;
+    if (tries >= 2) this.failedNames.add(t.image.name);
+    else this.queue = [t.image, ...this.queue];
     this.host.expectRaw(0, null);
     this.end();
     if (this.failures >= MAX_FAILURES) {

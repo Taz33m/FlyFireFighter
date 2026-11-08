@@ -15,11 +15,17 @@ function endedLine(c: ConsoleState): { readonly text: string; readonly tone: Ton
 function openLine(snap: ConsoleState["snapshot"]): { readonly text: string; readonly tone: Tone } {
   if (snap === null || snap.status === "connecting" || snap.status === "waiting") return { text: "Port open; asking the device who it is…", tone: "muted" };
   if (snap.status !== "connected") return { text: snap.detail ?? "The console cannot be used.", tone: "warn" };
-  if (snap.loading !== null && snap.loading.done < snap.loading.total) return { text: `Loading console screens ${snap.loading.done}/${snap.loading.total} (about 5 s each; buttons work meanwhile)…`, tone: "muted" };
+  return connectedLine(snap);
+}
+
+function connectedLine(snap: NonNullable<ConsoleState["snapshot"]>): { readonly text: string; readonly tone: Tone } {
+  const why = snap.detail === null ? "" : ` Last problem: ${snap.detail}`;
+  if (snap.loading !== null && snap.loading.done < snap.loading.total) return { text: `Loading console screens ${snap.loading.done}/${snap.loading.total} (about 5 s each; the device shows a text line until its screen is installed; buttons work meanwhile).${why}`, tone: "muted" };
+  if (snap.display === "text" && /DisplayCPU/i.test(snap.product ?? "")) return { text: `Text mode (images given up).${why}`, tone: "warn" };
   if (!snap.buttonsLive) return { text: "Connected; waiting for button events…", tone: "muted" };
   if (snap.abortPrimed) return { text: "Press red again (or keep holding) to abort the mission.", tone: "warn" };
   const screens = snap.display === "images" ? ", full screens" : ", text line";
-  return { text: `Connected (${snap.product ?? "FWOG main"}${screens}): GREEN approve, YELLOW reject, RED twice or hold 1 s to abort.`, tone: "ok" };
+  return { text: `Connected (${snap.product ?? "FWOG main"}${screens}): GREEN approve, YELLOW reject, RED twice or hold 1 s to abort.${why}`, tone: why === "" ? "ok" : "warn" };
 }
 
 function statusLine(c: ConsoleState): { readonly text: string; readonly tone: Tone } {

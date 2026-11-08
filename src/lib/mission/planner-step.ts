@@ -196,6 +196,8 @@ export class MissionPlanner {
   private readonly dwelled = new Set<ProposalId>();
   /** Waits for the turn toward the focus before proposing, per candidate. */
   private readonly faceWaits = new Map<string, number>();
+  /** Fires whose "suppression is not available" note was already logged (keyed by the note's place). */
+  private readonly unavailableAnnounced = new Set<string>();
   /** The scan facing the focus while holding a station, and no new one before dwellRetryTick after a refusal. */
   private dwellScanId: ProposalId | null = null;
   private dwellRetryTick = -Infinity;
@@ -297,8 +299,23 @@ export class MissionPlanner {
     const blocked = set.candidates.filter(c => c.target?.station != null && (this.unreachable.has(c.target.station, ctx.tick) || !flightPathExists(ctx, c.target.station))).map(c => c.id);
     if (blocked.length > 0) set = build([...omit, ...blocked]);
     this.lastSet = set;
+    this.announceUnavailableSuppression(set, t);
     if (this.remote !== null && this.broker.cloudActive) this.remote.plan(set, ctx.belief);
     else this.handleStep(this.broker.plan(set, ctx.belief, t.nowMs), t);
+  }
+
+  /**
+   * Shows the commander why no spray is offered: each "Suppression is not available" note (water unsafe for the
+   * fire's indicated class, or a jet reaching a person) is logged once per fire, so it appears in the timeline.
+   */
+  private announceUnavailableSuppression(set: CandidateSet, t: PlannerTick): void {
+    for (const note of set.notes) {
+      if (!note.startsWith("Suppression is not available")) continue;
+      const place = note.split(": ")[0];
+      if (this.unavailableAnnounced.has(place)) continue;
+      this.unavailableAnnounced.add(place);
+      t.log.append({ tick: t.ctx.tick, source: "planner", kind: "planner.suppression_unavailable", subject: null, reason: note, data: {} });
+    }
   }
 
   private handleStep(step: BrokerStep, t: PlannerTick): void {
