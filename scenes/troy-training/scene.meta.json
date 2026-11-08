@@ -1,0 +1,4678 @@
+{
+  "schema": "flyfirefighter.scene-meta/1",
+  "sceneId": "troy-training",
+  "revision": 1,
+  "units": "m",
+  "frames": {
+    "world": "right-handed, Z up, X east, Y north, metres (site grid: +X follows Peoples Avenue, 11.10 deg clockwise of true east; see origin)",
+    "gltf": "Y up: gltf (x, y, z) = world (x, z, -y)"
+  },
+  "origin": {
+    "description": "Area centroid of the rectilinearised OSM footprint of way 73141173 at ground level; z = 0 is the front-door threshold (flat site). World axes are a site grid aligned with the building and Peoples Avenue: +X points along Peoples Avenue toward 14th Street (true bearing 101.10 deg), +Y toward Peoples Avenue (bearing 11.10 deg). Geodetic local ENU metres from origin.latLon: east = 0.98131*x + 0.19245*y, north = -0.19245*x + 0.98131*y.",
+    "latLon": [
+      42.7328844,
+      -73.6781612
+    ]
+  },
+  "provenance": {
+    "exterior": {
+      "reference": "Heffner Alumni House, 1301 Peoples Avenue, Troy, NY (RPI)",
+      "method": "Approximate massing, not a scan. The OSM footprint (way 73141173) is projected to a local WGS84 tangent plane, rotated by the building's dominant edge bearing so walls and Peoples Avenue align with the world axes, snapped to a rectilinear outline and extruded with heights, wings and roof forms estimated from openly licensed photographs. Street, sidewalk, crossing and footway positions come from OSM centrelines. Flat procedural colours only; no photo pixels or textures.",
+      "sources": [
+        {
+          "title": "OpenStreetMap way 73141173 (Heffner Alumni House footprint, building:levels=3), version 7",
+          "url": "https://www.openstreetmap.org/way/73141173",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap node 12743734842 (main entrance), version 1",
+          "url": "https://www.openstreetmap.org/node/12743734842",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap node 12541056051 (fire hydrant), version 1",
+          "url": "https://www.openstreetmap.org/node/12541056051",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap way 5626991 (Peoples Avenue; peoples avenue centerline), version 23",
+          "url": "https://www.openstreetmap.org/way/5626991",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap way 5637663 (13th Street; 13th street centerline), version 9",
+          "url": "https://www.openstreetmap.org/way/5637663",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap way 5638062 (14th Street; 14th street centerline), version 14",
+          "url": "https://www.openstreetmap.org/way/5638062",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap way 946232027 (sidewalk peoples south and 13th east; sidewalk peoples south and 13th east), version 3",
+          "url": "https://www.openstreetmap.org/way/946232027",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap way 947753441 (sidewalk 14th west; sidewalk 14th west), version 3",
+          "url": "https://www.openstreetmap.org/way/947753441",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap way 1318242879 (sidewalk peoples north; sidewalk peoples north), version 2",
+          "url": "https://www.openstreetmap.org/way/1318242879",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap way 1318154554 (sidewalk 14th east; sidewalk 14th east), version 4",
+          "url": "https://www.openstreetmap.org/way/1318154554",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap way 1376363931 (footway main entrance; footway main entrance), version 1",
+          "url": "https://www.openstreetmap.org/way/1376363931",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap way 1362771419 (crossing 13th street; crossing 13th street), version 2",
+          "url": "https://www.openstreetmap.org/way/1362771419",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap way 1318240544 (crossing 14th street; crossing 14th street), version 2",
+          "url": "https://www.openstreetmap.org/way/1318240544",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "OpenStreetMap way 104737328 (J Lot; parking j lot), version 1",
+          "url": "https://www.openstreetmap.org/way/104737328",
+          "license": "ODbL 1.0 — © OpenStreetMap contributors",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "Wikimedia Commons category: Heffner Alumni House (19 photographs by RPI2026F1, 2023-03-22)",
+          "url": "https://commons.wikimedia.org/wiki/Category:Heffner_Alumni_House",
+          "license": "CC BY-SA 4.0 (photographs consulted only; not redistributed)",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "Wikimedia Commons: RPI Alumni House 01.png by RPI2026F1 — south-east lawn: gabled south block, conservatory, glazed link, east wing pyramid",
+          "url": "https://commons.wikimedia.org/wiki/File:RPI_Alumni_House_01.png",
+          "license": "CC BY-SA 4.0",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "Wikimedia Commons: RPI Alumni House 02.png by RPI2026F1 — east lawn toward 14th Street: east gable end with chimney, link, east wing, street trees",
+          "url": "https://commons.wikimedia.org/wiki/File:RPI_Alumni_House_02.png",
+          "license": "CC BY-SA 4.0",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "Wikimedia Commons: RPI Alumni House 03.png by RPI2026F1 — south lawn: conservatory and gable end, site sloping west",
+          "url": "https://commons.wikimedia.org/wiki/File:RPI_Alumni_House_03.png",
+          "license": "CC BY-SA 4.0",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "Wikimedia Commons: RPI Alumni House 05.png by RPI2026F1 — east wing east face: two storeys, parapet, glass pyramid skylight",
+          "url": "https://commons.wikimedia.org/wiki/File:RPI_Alumni_House_05.png",
+          "license": "CC BY-SA 4.0",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "Wikimedia Commons: RPI Alumni House 07.png by RPI2026F1 — main entrance: teal glazed doors, curtain wall, sloped glass canopy, brick pavers",
+          "url": "https://commons.wikimedia.org/wiki/File:RPI_Alumni_House_07.png",
+          "license": "CC BY-SA 4.0",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "Wikimedia Commons: RPI Alumni House 09.png by RPI2026F1 — north lawn: north wing with pyramid-roofed block and glazed link",
+          "url": "https://commons.wikimedia.org/wiki/File:RPI_Alumni_House_09.png",
+          "license": "CC BY-SA 4.0",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "Wikimedia Commons: RPI Alumni House 10.png by RPI2026F1 — north facade east end: curved parapet, chimney, ground/upper window rhythm",
+          "url": "https://commons.wikimedia.org/wiki/File:RPI_Alumni_House_10.png",
+          "license": "CC BY-SA 4.0",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "Wikimedia Commons: RPI Alumni House 12.png by RPI2026F1 — north facade: stone string course, keystones, tall ground-floor windows",
+          "url": "https://commons.wikimedia.org/wiki/File:RPI_Alumni_House_12.png",
+          "license": "CC BY-SA 4.0",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "Wikimedia Commons: RPI Alumni House 15.png by RPI2026F1 — north facade west end and corner tower with pyramid roof",
+          "url": "https://commons.wikimedia.org/wiki/File:RPI_Alumni_House_15.png",
+          "license": "CC BY-SA 4.0",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "Wikimedia Commons: RPI Alumni House 16.png by RPI2026F1 — north-west: tower, west facade bay, window rhythm",
+          "url": "https://commons.wikimedia.org/wiki/File:RPI_Alumni_House_16.png",
+          "license": "CC BY-SA 4.0",
+          "retrieved": "2026-11-07"
+        },
+        {
+          "title": "Wikimedia Commons: RPI Alumni House 18.png by RPI2026F1 — west/service side: bay window, oculus, retaining walls and bins",
+          "url": "https://commons.wikimedia.org/wiki/File:RPI_Alumni_House_18.png",
+          "license": "CC BY-SA 4.0",
+          "retrieved": "2026-11-07"
+        }
+      ],
+      "estimated": [
+        "All heights. Two above-grade storeys are visible in the photographs (OSM building:levels=3 is not used): ground floor 0.00-3.25 m, upper floor 3.60-6.50 m, flat roofs 6.90 m, parapets 7.80 m.",
+        "Subdivision of the OSM footprint into wings (north wing, north-west tower, south gabled block, conservatory, south-west pavilion, east wing) and the positions of their internal boundaries; tower width 5.2 m and conservatory depth 2.71 m.",
+        "Roof forms and heights: 50-degree standing-seam gable over the south block (ridge 10.98 m), copper pyramids on the tower (11.2 m) and south-west pavilion (8.2 m), conservatory glass roof 3.0-5.2 m, glass pyramid skylight on the east wing.",
+        "Window and door counts, positions and sizes on every facade (rhythm only), facade trim (stone string course, coping, keystones, sills) and all colours.",
+        "Chimney positions and heights.",
+        "Front door size (1.0 m x 2.2 m), leaf and surround; only its location comes from the OSM entrance=main node.",
+        "Entrance plaza extent, glazed entrance canopy and footway width; the footway centreline is OSM way 1376363931.",
+        "Street widths (Peoples Avenue 10.0 m, 14th Street 9.0 m, 13th Street 7.0 m curb to curb), curb height 0.15 m, sidewalk width 1.5 m and verges; centrelines come from OSM.",
+        "Flat ground at z = 0 m; the real site slopes down to the west and south.",
+        "Tree, shrub, lamp, bench and bin positions and sizes (from photographs, not surveyed); the fire hydrant position is OSM node 12541056051.",
+        "Site grid: the footprint is rotated by 11.10 degrees and snapped to a rectilinear outline (maximum vertex shift 0.013 m); street centrelines are snapped to the same grid.",
+        "The house region (east part of the footprint) is an authored training interior with authored openings; the rest of the footprint is a sealed volume with decorative windows."
+      ]
+    },
+    "interior": {
+      "kind": "authored_fictional",
+      "statement": "Authored training interior; not the reference building's floor plan."
+    },
+    "incident": "fictional"
+  },
+  "floors": [
+    {
+      "index": 0,
+      "elevationM": 0.0,
+      "ceilingM": 3.25
+    },
+    {
+      "index": 1,
+      "elevationM": 3.6,
+      "ceilingM": 6.5
+    }
+  ],
+  "rooms": [
+    {
+      "id": "room-g-entry",
+      "name": "Entry hall and stair foot",
+      "floor": 0,
+      "polygon": [
+        [
+          10.15,
+          3.157
+        ],
+        [
+          19.552,
+          3.157
+        ],
+        [
+          19.552,
+          4.357
+        ],
+        [
+          13.532,
+          4.357
+        ],
+        [
+          13.532,
+          9.47
+        ],
+        [
+          10.15,
+          9.47
+        ]
+      ],
+      "zMin": 0.0,
+      "zMax": 3.25
+    },
+    {
+      "id": "room-g-living",
+      "name": "Living room",
+      "floor": 0,
+      "polygon": [
+        [
+          10.15,
+          -0.408
+        ],
+        [
+          16.811,
+          -0.408
+        ],
+        [
+          16.811,
+          -2.779
+        ],
+        [
+          19.552,
+          -2.779
+        ],
+        [
+          19.552,
+          3.007
+        ],
+        [
+          10.15,
+          3.007
+        ]
+      ],
+      "zMin": 0.0,
+      "zMax": 3.25
+    },
+    {
+      "id": "room-g-kitchen",
+      "name": "Kitchen and dining room",
+      "floor": 0,
+      "polygon": [
+        [
+          19.702,
+          -2.779
+        ],
+        [
+          26.253,
+          -2.779
+        ],
+        [
+          26.253,
+          7.116
+        ],
+        [
+          21.183,
+          7.116
+        ],
+        [
+          21.183,
+          4.357
+        ],
+        [
+          19.702,
+          4.357
+        ]
+      ],
+      "zMin": 0.0,
+      "zMax": 3.25
+    },
+    {
+      "id": "room-u-hall",
+      "name": "Upstairs hall, landing and stairwell",
+      "floor": 1,
+      "polygon": [
+        [
+          19.702,
+          -0.2
+        ],
+        [
+          22.0,
+          -0.2
+        ],
+        [
+          22.0,
+          4.357
+        ],
+        [
+          13.882,
+          4.357
+        ],
+        [
+          13.882,
+          3.157
+        ],
+        [
+          19.702,
+          3.157
+        ]
+      ],
+      "zMin": 3.6,
+      "zMax": 6.5
+    },
+    {
+      "id": "room-u-rear-bedroom",
+      "name": "Upstairs rear bedroom",
+      "floor": 1,
+      "polygon": [
+        [
+          22.15,
+          -2.779
+        ],
+        [
+          26.253,
+          -2.779
+        ],
+        [
+          26.253,
+          1.45
+        ],
+        [
+          22.15,
+          1.45
+        ]
+      ],
+      "zMin": 3.6,
+      "zMax": 6.5
+    },
+    {
+      "id": "room-u-front-bedroom",
+      "name": "Upstairs front bedroom",
+      "floor": 1,
+      "polygon": [
+        [
+          22.15,
+          1.6
+        ],
+        [
+          26.253,
+          1.6
+        ],
+        [
+          26.253,
+          7.116
+        ],
+        [
+          21.183,
+          7.116
+        ],
+        [
+          21.183,
+          4.507
+        ],
+        [
+          22.15,
+          4.507
+        ]
+      ],
+      "zMin": 3.6,
+      "zMax": 6.5
+    },
+    {
+      "id": "room-u-bath",
+      "name": "Upstairs bathroom",
+      "floor": 1,
+      "polygon": [
+        [
+          19.702,
+          -2.779
+        ],
+        [
+          22.0,
+          -2.779
+        ],
+        [
+          22.0,
+          -0.35
+        ],
+        [
+          19.702,
+          -0.35
+        ]
+      ],
+      "zMin": 3.6,
+      "zMax": 6.5
+    },
+    {
+      "id": "room-u-study",
+      "name": "Upstairs study",
+      "floor": 1,
+      "polygon": [
+        [
+          13.882,
+          -0.408
+        ],
+        [
+          16.811,
+          -0.408
+        ],
+        [
+          16.811,
+          -2.779
+        ],
+        [
+          19.552,
+          -2.779
+        ],
+        [
+          19.552,
+          3.007
+        ],
+        [
+          13.882,
+          3.007
+        ]
+      ],
+      "zMin": 3.6,
+      "zMax": 6.5
+    }
+  ],
+  "openings": [
+    {
+      "id": "door-front",
+      "kind": "door",
+      "rooms": [
+        "room-g-entry",
+        "exterior"
+      ],
+      "center": [
+        13.707,
+        6.209,
+        1.1
+      ],
+      "widthM": 1.0,
+      "heightM": 2.2,
+      "sillHeightM": 0.0,
+      "outwardNormal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": false
+    },
+    {
+      "id": "win-g-entry-n",
+      "kind": "window",
+      "rooms": [
+        "room-g-entry",
+        "exterior"
+      ],
+      "center": [
+        11.841,
+        9.645,
+        1.8
+      ],
+      "widthM": 1.6,
+      "heightM": 2.4,
+      "sillHeightM": 0.6,
+      "outwardNormal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-g-entry-e",
+      "kind": "window",
+      "rooms": [
+        "room-g-entry",
+        "exterior"
+      ],
+      "center": [
+        13.707,
+        8.3,
+        1.8
+      ],
+      "widthM": 1.0,
+      "heightM": 2.4,
+      "sillHeightM": 0.6,
+      "outwardNormal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-g-living-s1",
+      "kind": "window",
+      "rooms": [
+        "room-g-living",
+        "exterior"
+      ],
+      "center": [
+        11.6,
+        -0.583,
+        1.8
+      ],
+      "widthM": 1.6,
+      "heightM": 2.4,
+      "sillHeightM": 0.6,
+      "outwardNormal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-g-living-s2",
+      "kind": "window",
+      "rooms": [
+        "room-g-living",
+        "exterior"
+      ],
+      "center": [
+        15.0,
+        -0.583,
+        1.8
+      ],
+      "widthM": 1.6,
+      "heightM": 2.4,
+      "sillHeightM": 0.6,
+      "outwardNormal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-g-living-s3",
+      "kind": "window",
+      "rooms": [
+        "room-g-living",
+        "exterior"
+      ],
+      "center": [
+        18.2,
+        -2.954,
+        1.8
+      ],
+      "widthM": 1.4,
+      "heightM": 2.4,
+      "sillHeightM": 0.6,
+      "outwardNormal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-g-kitchen-s",
+      "kind": "window",
+      "rooms": [
+        "room-g-kitchen",
+        "exterior"
+      ],
+      "center": [
+        23.2,
+        -2.954,
+        1.7
+      ],
+      "widthM": 1.6,
+      "heightM": 1.4,
+      "sillHeightM": 1.0,
+      "outwardNormal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-g-kitchen-e",
+      "kind": "window",
+      "rooms": [
+        "room-g-kitchen",
+        "exterior"
+      ],
+      "center": [
+        26.428,
+        1.2,
+        1.8
+      ],
+      "widthM": 2.0,
+      "heightM": 1.6,
+      "sillHeightM": 1.0,
+      "outwardNormal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-g-kitchen-n",
+      "kind": "window",
+      "rooms": [
+        "room-g-kitchen",
+        "exterior"
+      ],
+      "center": [
+        23.7,
+        7.291,
+        1.7
+      ],
+      "widthM": 1.6,
+      "heightM": 1.4,
+      "sillHeightM": 1.0,
+      "outwardNormal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-u-rear-bedroom",
+      "kind": "window",
+      "rooms": [
+        "room-u-rear-bedroom",
+        "exterior"
+      ],
+      "center": [
+        24.201,
+        -2.954,
+        5.1
+      ],
+      "widthM": 1.1,
+      "heightM": 1.4,
+      "sillHeightM": 0.8,
+      "outwardNormal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-u-rear-bedroom-east",
+      "kind": "window",
+      "rooms": [
+        "room-u-rear-bedroom",
+        "exterior"
+      ],
+      "center": [
+        26.428,
+        0.6,
+        5.1
+      ],
+      "widthM": 1.0,
+      "heightM": 1.4,
+      "sillHeightM": 0.8,
+      "outwardNormal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-u-bath-s",
+      "kind": "window",
+      "rooms": [
+        "room-u-bath",
+        "exterior"
+      ],
+      "center": [
+        20.85,
+        -2.954,
+        5.25
+      ],
+      "widthM": 0.7,
+      "heightM": 0.9,
+      "sillHeightM": 1.2,
+      "outwardNormal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-u-study-s1",
+      "kind": "window",
+      "rooms": [
+        "room-u-study",
+        "exterior"
+      ],
+      "center": [
+        18.2,
+        -2.954,
+        5.1
+      ],
+      "widthM": 1.1,
+      "heightM": 1.4,
+      "sillHeightM": 0.8,
+      "outwardNormal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-u-study-s2",
+      "kind": "window",
+      "rooms": [
+        "room-u-study",
+        "exterior"
+      ],
+      "center": [
+        15.2,
+        -0.583,
+        5.1
+      ],
+      "widthM": 1.1,
+      "heightM": 1.4,
+      "sillHeightM": 0.8,
+      "outwardNormal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-u-front-bedroom-e",
+      "kind": "window",
+      "rooms": [
+        "room-u-front-bedroom",
+        "exterior"
+      ],
+      "center": [
+        26.428,
+        4.6,
+        5.1
+      ],
+      "widthM": 1.1,
+      "heightM": 1.4,
+      "sillHeightM": 0.8,
+      "outwardNormal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "win-u-front-bedroom-n",
+      "kind": "window",
+      "rooms": [
+        "room-u-front-bedroom",
+        "exterior"
+      ],
+      "center": [
+        23.7,
+        7.291,
+        5.1
+      ],
+      "widthM": 1.1,
+      "heightM": 1.4,
+      "sillHeightM": 0.8,
+      "outwardNormal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": true
+    },
+    {
+      "id": "door-g-entry-living",
+      "kind": "door",
+      "rooms": [
+        "room-g-entry",
+        "room-g-living"
+      ],
+      "center": [
+        11.85,
+        3.082,
+        1.1
+      ],
+      "widthM": 1.0,
+      "heightM": 2.2,
+      "sillHeightM": 0.0,
+      "outwardNormal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "initialState": "open",
+      "glazed": false
+    },
+    {
+      "id": "door-g-living-kitchen",
+      "kind": "door",
+      "rooms": [
+        "room-g-living",
+        "room-g-kitchen"
+      ],
+      "center": [
+        19.627,
+        0.6,
+        1.05
+      ],
+      "widthM": 0.9,
+      "heightM": 2.1,
+      "sillHeightM": 0.0,
+      "outwardNormal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "initialState": "open",
+      "glazed": false
+    },
+    {
+      "id": "door-u-rear-bedroom",
+      "kind": "door",
+      "rooms": [
+        "room-u-rear-bedroom",
+        "room-u-hall"
+      ],
+      "center": [
+        22.075,
+        0.55,
+        4.65
+      ],
+      "widthM": 0.8,
+      "heightM": 2.1,
+      "sillHeightM": 0.0,
+      "outwardNormal": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "initialState": "open",
+      "glazed": false
+    },
+    {
+      "id": "door-u-front-bedroom",
+      "kind": "door",
+      "rooms": [
+        "room-u-front-bedroom",
+        "room-u-hall"
+      ],
+      "center": [
+        22.075,
+        3.2,
+        4.65
+      ],
+      "widthM": 0.9,
+      "heightM": 2.1,
+      "sillHeightM": 0.0,
+      "outwardNormal": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "initialState": "closed",
+      "glazed": false
+    },
+    {
+      "id": "door-u-bath",
+      "kind": "door",
+      "rooms": [
+        "room-u-bath",
+        "room-u-hall"
+      ],
+      "center": [
+        20.85,
+        -0.275,
+        4.65
+      ],
+      "widthM": 0.8,
+      "heightM": 2.1,
+      "sillHeightM": 0.0,
+      "outwardNormal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "initialState": "open",
+      "glazed": false
+    },
+    {
+      "id": "door-u-study",
+      "kind": "door",
+      "rooms": [
+        "room-u-study",
+        "room-u-hall"
+      ],
+      "center": [
+        19.627,
+        1.2,
+        4.65
+      ],
+      "widthM": 0.9,
+      "heightM": 2.1,
+      "sillHeightM": 0.0,
+      "outwardNormal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "initialState": "open",
+      "glazed": false
+    },
+    {
+      "id": "opening-stairwell",
+      "kind": "opening",
+      "rooms": [
+        "room-g-entry",
+        "room-u-hall"
+      ],
+      "center": [
+        16.717,
+        3.757,
+        3.425
+      ],
+      "widthM": 5.67,
+      "heightM": 1.2,
+      "sillHeightM": 0.0,
+      "outwardNormal": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "initialState": "open",
+      "glazed": false
+    }
+  ],
+  "stairs": [
+    {
+      "id": "stair-main",
+      "fromFloor": 0,
+      "toFloor": 1,
+      "bottom": [
+        14.232,
+        3.757,
+        0.0
+      ],
+      "top": [
+        19.552,
+        3.757,
+        3.6
+      ],
+      "widthM": 1.2
+    }
+  ],
+  "colliders": [
+    {
+      "id": "col-ground-road",
+      "kind": "ground",
+      "min": [
+        -48.0,
+        -34.0,
+        -1.0
+      ],
+      "max": [
+        62.0,
+        58.0,
+        -0.15
+      ]
+    },
+    {
+      "id": "col-ground-block",
+      "kind": "ground",
+      "min": [
+        -29.65,
+        -34.0,
+        -1.0
+      ],
+      "max": [
+        39.75,
+        36.0,
+        0.0
+      ]
+    },
+    {
+      "id": "col-ground-west",
+      "kind": "ground",
+      "min": [
+        -48.0,
+        -34.0,
+        -1.0
+      ],
+      "max": [
+        -36.65,
+        36.0,
+        0.0
+      ]
+    },
+    {
+      "id": "col-ground-east",
+      "kind": "ground",
+      "min": [
+        48.75,
+        -34.0,
+        -1.0
+      ],
+      "max": [
+        62.0,
+        36.0,
+        0.0
+      ]
+    },
+    {
+      "id": "col-ground-north-w",
+      "kind": "ground",
+      "min": [
+        -48.0,
+        46.0,
+        -1.0
+      ],
+      "max": [
+        -36.65,
+        58.0,
+        0.0
+      ]
+    },
+    {
+      "id": "col-ground-north-c",
+      "kind": "ground",
+      "min": [
+        -29.65,
+        46.0,
+        -1.0
+      ],
+      "max": [
+        39.75,
+        58.0,
+        0.0
+      ]
+    },
+    {
+      "id": "col-ground-north-e",
+      "kind": "ground",
+      "min": [
+        48.75,
+        46.0,
+        -1.0
+      ],
+      "max": [
+        62.0,
+        58.0,
+        0.0
+      ]
+    },
+    {
+      "id": "col-mass-body-01",
+      "kind": "wall",
+      "min": [
+        -18.209,
+        -9.783,
+        0.0
+      ],
+      "max": [
+        -10.24,
+        2.6,
+        6.9
+      ]
+    },
+    {
+      "id": "col-mass-body-02",
+      "kind": "wall",
+      "min": [
+        -17.058,
+        2.6,
+        0.0
+      ],
+      "max": [
+        9.85,
+        4.274,
+        6.9
+      ]
+    },
+    {
+      "id": "col-mass-body-03",
+      "kind": "wall",
+      "min": [
+        -14.409,
+        4.274,
+        0.0
+      ],
+      "max": [
+        9.85,
+        9.82,
+        6.9
+      ]
+    },
+    {
+      "id": "col-mass-body-04",
+      "kind": "wall",
+      "min": [
+        -10.24,
+        -0.758,
+        0.0
+      ],
+      "max": [
+        9.85,
+        2.6,
+        6.9
+      ]
+    },
+    {
+      "id": "col-mass-sw-01",
+      "kind": "wall",
+      "min": [
+        -18.209,
+        -10.578,
+        0.0
+      ],
+      "max": [
+        -12.827,
+        -9.783,
+        6.4
+      ]
+    },
+    {
+      "id": "col-mass-sw-02",
+      "kind": "wall",
+      "min": [
+        -17.378,
+        -15.635,
+        0.0
+      ],
+      "max": [
+        -12.827,
+        -11.458,
+        6.4
+      ]
+    },
+    {
+      "id": "col-mass-sw-03",
+      "kind": "wall",
+      "min": [
+        -16.079,
+        -11.458,
+        0.0
+      ],
+      "max": [
+        -12.827,
+        -10.578,
+        6.4
+      ]
+    },
+    {
+      "id": "col-roof-sw-1",
+      "kind": "roof",
+      "min": [
+        -17.378,
+        -15.635,
+        6.4
+      ],
+      "max": [
+        -12.827,
+        -11.458,
+        7.0
+      ]
+    },
+    {
+      "id": "col-roof-sw-2",
+      "kind": "roof",
+      "min": [
+        -16.619,
+        -14.939,
+        7.0
+      ],
+      "max": [
+        -13.585,
+        -12.154,
+        7.6
+      ]
+    },
+    {
+      "id": "col-roof-sw-3",
+      "kind": "roof",
+      "min": [
+        -15.861,
+        -14.243,
+        7.6
+      ],
+      "max": [
+        -14.344,
+        -12.85,
+        8.2
+      ]
+    },
+    {
+      "id": "col-mass-tower",
+      "kind": "wall",
+      "min": [
+        -19.609,
+        4.274,
+        0.0
+      ],
+      "max": [
+        -14.409,
+        9.82,
+        9.4
+      ]
+    },
+    {
+      "id": "col-roof-tower-1",
+      "kind": "roof",
+      "min": [
+        -19.609,
+        4.274,
+        9.4
+      ],
+      "max": [
+        -14.409,
+        9.82,
+        10.0
+      ]
+    },
+    {
+      "id": "col-roof-tower-2",
+      "kind": "roof",
+      "min": [
+        -18.742,
+        5.198,
+        10.0
+      ],
+      "max": [
+        -15.276,
+        8.896,
+        10.6
+      ]
+    },
+    {
+      "id": "col-roof-tower-3",
+      "kind": "roof",
+      "min": [
+        -17.876,
+        6.123,
+        10.6
+      ],
+      "max": [
+        -16.142,
+        7.971,
+        11.2
+      ]
+    },
+    {
+      "id": "col-mass-gabled",
+      "kind": "wall",
+      "min": [
+        -10.24,
+        -7.6,
+        0.0
+      ],
+      "max": [
+        9.85,
+        -0.758,
+        6.9
+      ]
+    },
+    {
+      "id": "col-roof-gabled-1",
+      "kind": "roof",
+      "min": [
+        -10.24,
+        -7.6,
+        6.9
+      ],
+      "max": [
+        9.85,
+        -0.758,
+        7.919
+      ]
+    },
+    {
+      "id": "col-roof-gabled-2",
+      "kind": "roof",
+      "min": [
+        -10.24,
+        -6.745,
+        7.919
+      ],
+      "max": [
+        9.85,
+        -1.613,
+        8.939
+      ]
+    },
+    {
+      "id": "col-roof-gabled-3",
+      "kind": "roof",
+      "min": [
+        -10.24,
+        -5.889,
+        8.939
+      ],
+      "max": [
+        9.85,
+        -2.469,
+        9.958
+      ]
+    },
+    {
+      "id": "col-roof-gabled-4",
+      "kind": "roof",
+      "min": [
+        -10.24,
+        -5.034,
+        9.958
+      ],
+      "max": [
+        9.85,
+        -3.324,
+        10.977
+      ]
+    },
+    {
+      "id": "col-mass-conservatory",
+      "kind": "wall",
+      "min": [
+        -10.24,
+        -10.31,
+        0.0
+      ],
+      "max": [
+        9.85,
+        -7.6,
+        3.0
+      ]
+    },
+    {
+      "id": "col-roof-conservatory-1",
+      "kind": "roof",
+      "min": [
+        -10.24,
+        -10.31,
+        3.0
+      ],
+      "max": [
+        9.85,
+        -7.6,
+        4.1
+      ]
+    },
+    {
+      "id": "col-roof-conservatory-2",
+      "kind": "roof",
+      "min": [
+        -10.24,
+        -8.955,
+        4.1
+      ],
+      "max": [
+        9.85,
+        -7.6,
+        5.2
+      ]
+    },
+    {
+      "id": "col-chimney-gable-east",
+      "kind": "wall",
+      "min": [
+        9.85,
+        -2.4,
+        0.0
+      ],
+      "max": [
+        10.35,
+        -1.4,
+        12.097
+      ]
+    },
+    {
+      "id": "col-chimney-body-ne",
+      "kind": "wall",
+      "min": [
+        8.2,
+        8.2,
+        6.9
+      ],
+      "max": [
+        9.1,
+        8.9,
+        9.12
+      ]
+    },
+    {
+      "id": "col-chimney-body-mid",
+      "kind": "wall",
+      "min": [
+        -3.35,
+        4.2,
+        6.9
+      ],
+      "max": [
+        -2.65,
+        4.9,
+        8.52
+      ]
+    },
+    {
+      "id": "col-chimney-body-west",
+      "kind": "wall",
+      "min": [
+        -12.35,
+        3.8,
+        6.9
+      ],
+      "max": [
+        -11.65,
+        4.5,
+        8.52
+      ]
+    },
+    {
+      "id": "col-parapet-01",
+      "kind": "wall",
+      "min": [
+        -14.409,
+        9.52,
+        6.9
+      ],
+      "max": [
+        -10.24,
+        9.82,
+        7.8
+      ]
+    },
+    {
+      "id": "col-parapet-02",
+      "kind": "wall",
+      "min": [
+        -10.24,
+        9.52,
+        6.9
+      ],
+      "max": [
+        9.85,
+        9.82,
+        7.8
+      ]
+    },
+    {
+      "id": "col-parapet-03",
+      "kind": "wall",
+      "min": [
+        -12.827,
+        -9.783,
+        6.9
+      ],
+      "max": [
+        -10.24,
+        -9.483,
+        7.8
+      ]
+    },
+    {
+      "id": "col-parapet-04",
+      "kind": "wall",
+      "min": [
+        -18.209,
+        -9.783,
+        6.9
+      ],
+      "max": [
+        -17.909,
+        -7.6,
+        7.8
+      ]
+    },
+    {
+      "id": "col-parapet-05",
+      "kind": "wall",
+      "min": [
+        -18.209,
+        -7.6,
+        6.9
+      ],
+      "max": [
+        -17.909,
+        -0.758,
+        7.8
+      ]
+    },
+    {
+      "id": "col-parapet-06",
+      "kind": "wall",
+      "min": [
+        -18.209,
+        -0.758,
+        6.9
+      ],
+      "max": [
+        -17.909,
+        2.6,
+        7.8
+      ]
+    },
+    {
+      "id": "col-parapet-07",
+      "kind": "wall",
+      "min": [
+        -18.209,
+        2.3,
+        6.9
+      ],
+      "max": [
+        -17.058,
+        2.6,
+        7.8
+      ]
+    },
+    {
+      "id": "col-parapet-08",
+      "kind": "wall",
+      "min": [
+        -17.058,
+        2.6,
+        6.9
+      ],
+      "max": [
+        -16.758,
+        4.274,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-north-01",
+      "kind": "wall",
+      "min": [
+        9.85,
+        9.47,
+        0.0
+      ],
+      "max": [
+        11.041,
+        9.82,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-north-02",
+      "kind": "wall",
+      "min": [
+        11.041,
+        9.47,
+        0.0
+      ],
+      "max": [
+        12.641,
+        9.82,
+        0.6
+      ]
+    },
+    {
+      "id": "col-wall-north-03",
+      "kind": "wall",
+      "min": [
+        11.041,
+        9.47,
+        3.0
+      ],
+      "max": [
+        12.641,
+        9.82,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-north-04",
+      "kind": "wall",
+      "min": [
+        12.641,
+        9.47,
+        0.0
+      ],
+      "max": [
+        13.882,
+        9.82,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-ra-east-01",
+      "kind": "wall",
+      "min": [
+        13.532,
+        4.707,
+        0.0
+      ],
+      "max": [
+        13.882,
+        5.709,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-ra-east-02",
+      "kind": "wall",
+      "min": [
+        13.532,
+        5.709,
+        2.2
+      ],
+      "max": [
+        13.882,
+        6.709,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-ra-east-03",
+      "kind": "wall",
+      "min": [
+        13.532,
+        6.709,
+        0.0
+      ],
+      "max": [
+        13.882,
+        7.8,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-ra-east-04",
+      "kind": "wall",
+      "min": [
+        13.532,
+        7.8,
+        0.0
+      ],
+      "max": [
+        13.882,
+        8.8,
+        0.6
+      ]
+    },
+    {
+      "id": "col-wall-ra-east-05",
+      "kind": "wall",
+      "min": [
+        13.532,
+        7.8,
+        3.0
+      ],
+      "max": [
+        13.882,
+        8.8,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-ra-east-06",
+      "kind": "wall",
+      "min": [
+        13.532,
+        8.8,
+        0.0
+      ],
+      "max": [
+        13.882,
+        9.47,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-plaza-01",
+      "kind": "wall",
+      "min": [
+        13.532,
+        4.357,
+        0.0
+      ],
+      "max": [
+        21.183,
+        4.707,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rd-west-01",
+      "kind": "wall",
+      "min": [
+        20.833,
+        4.707,
+        0.0
+      ],
+      "max": [
+        21.183,
+        7.116,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rd-north-01",
+      "kind": "wall",
+      "min": [
+        20.833,
+        7.116,
+        0.0
+      ],
+      "max": [
+        22.9,
+        7.466,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rd-north-02",
+      "kind": "wall",
+      "min": [
+        22.9,
+        7.116,
+        0.0
+      ],
+      "max": [
+        23.15,
+        7.466,
+        1.0
+      ]
+    },
+    {
+      "id": "col-wall-rd-north-03",
+      "kind": "wall",
+      "min": [
+        22.9,
+        7.116,
+        2.4
+      ],
+      "max": [
+        23.15,
+        7.466,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rd-north-04",
+      "kind": "wall",
+      "min": [
+        23.15,
+        7.116,
+        0.0
+      ],
+      "max": [
+        24.25,
+        7.466,
+        1.0
+      ]
+    },
+    {
+      "id": "col-wall-rd-north-05",
+      "kind": "wall",
+      "min": [
+        23.15,
+        7.116,
+        2.4
+      ],
+      "max": [
+        24.25,
+        7.466,
+        4.4
+      ]
+    },
+    {
+      "id": "col-wall-rd-north-06",
+      "kind": "wall",
+      "min": [
+        23.15,
+        7.116,
+        5.8
+      ],
+      "max": [
+        24.25,
+        7.466,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rd-north-07",
+      "kind": "wall",
+      "min": [
+        24.25,
+        7.116,
+        0.0
+      ],
+      "max": [
+        24.5,
+        7.466,
+        1.0
+      ]
+    },
+    {
+      "id": "col-wall-rd-north-08",
+      "kind": "wall",
+      "min": [
+        24.25,
+        7.116,
+        2.4
+      ],
+      "max": [
+        24.5,
+        7.466,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rd-north-09",
+      "kind": "wall",
+      "min": [
+        24.5,
+        7.116,
+        0.0
+      ],
+      "max": [
+        26.603,
+        7.466,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-east-01",
+      "kind": "wall",
+      "min": [
+        26.253,
+        -2.779,
+        0.0
+      ],
+      "max": [
+        26.603,
+        0.1,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-east-02",
+      "kind": "wall",
+      "min": [
+        26.253,
+        0.1,
+        0.0
+      ],
+      "max": [
+        26.603,
+        0.2,
+        4.4
+      ]
+    },
+    {
+      "id": "col-wall-east-03",
+      "kind": "wall",
+      "min": [
+        26.253,
+        0.1,
+        5.8
+      ],
+      "max": [
+        26.603,
+        0.2,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-east-04",
+      "kind": "wall",
+      "min": [
+        26.253,
+        0.2,
+        0.0
+      ],
+      "max": [
+        26.603,
+        1.1,
+        1.0
+      ]
+    },
+    {
+      "id": "col-wall-east-05",
+      "kind": "wall",
+      "min": [
+        26.253,
+        0.2,
+        2.6
+      ],
+      "max": [
+        26.603,
+        1.1,
+        4.4
+      ]
+    },
+    {
+      "id": "col-wall-east-06",
+      "kind": "wall",
+      "min": [
+        26.253,
+        0.2,
+        5.8
+      ],
+      "max": [
+        26.603,
+        1.1,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-east-07",
+      "kind": "wall",
+      "min": [
+        26.253,
+        1.1,
+        0.0
+      ],
+      "max": [
+        26.603,
+        2.2,
+        1.0
+      ]
+    },
+    {
+      "id": "col-wall-east-08",
+      "kind": "wall",
+      "min": [
+        26.253,
+        1.1,
+        2.6
+      ],
+      "max": [
+        26.603,
+        2.2,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-east-09",
+      "kind": "wall",
+      "min": [
+        26.253,
+        2.2,
+        0.0
+      ],
+      "max": [
+        26.603,
+        4.05,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-east-10",
+      "kind": "wall",
+      "min": [
+        26.253,
+        4.05,
+        0.0
+      ],
+      "max": [
+        26.603,
+        5.15,
+        4.4
+      ]
+    },
+    {
+      "id": "col-wall-east-11",
+      "kind": "wall",
+      "min": [
+        26.253,
+        4.05,
+        5.8
+      ],
+      "max": [
+        26.603,
+        5.15,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-east-12",
+      "kind": "wall",
+      "min": [
+        26.253,
+        5.15,
+        0.0
+      ],
+      "max": [
+        26.603,
+        7.116,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rear-01",
+      "kind": "wall",
+      "min": [
+        16.461,
+        -3.129,
+        0.0
+      ],
+      "max": [
+        17.5,
+        -2.779,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rear-02",
+      "kind": "wall",
+      "min": [
+        17.5,
+        -3.129,
+        0.0
+      ],
+      "max": [
+        17.65,
+        -2.779,
+        0.6
+      ]
+    },
+    {
+      "id": "col-wall-rear-03",
+      "kind": "wall",
+      "min": [
+        17.5,
+        -3.129,
+        3.0
+      ],
+      "max": [
+        17.65,
+        -2.779,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rear-04",
+      "kind": "wall",
+      "min": [
+        17.65,
+        -3.129,
+        0.0
+      ],
+      "max": [
+        18.75,
+        -2.779,
+        0.6
+      ]
+    },
+    {
+      "id": "col-wall-rear-05",
+      "kind": "wall",
+      "min": [
+        17.65,
+        -3.129,
+        3.0
+      ],
+      "max": [
+        18.75,
+        -2.779,
+        4.4
+      ]
+    },
+    {
+      "id": "col-wall-rear-06",
+      "kind": "wall",
+      "min": [
+        17.65,
+        -3.129,
+        5.8
+      ],
+      "max": [
+        18.75,
+        -2.779,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rear-07",
+      "kind": "wall",
+      "min": [
+        18.75,
+        -3.129,
+        0.0
+      ],
+      "max": [
+        18.9,
+        -2.779,
+        0.6
+      ]
+    },
+    {
+      "id": "col-wall-rear-08",
+      "kind": "wall",
+      "min": [
+        18.75,
+        -3.129,
+        3.0
+      ],
+      "max": [
+        18.9,
+        -2.779,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rear-09",
+      "kind": "wall",
+      "min": [
+        18.9,
+        -3.129,
+        0.0
+      ],
+      "max": [
+        20.5,
+        -2.779,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rear-10",
+      "kind": "wall",
+      "min": [
+        20.5,
+        -3.129,
+        0.0
+      ],
+      "max": [
+        21.2,
+        -2.779,
+        4.8
+      ]
+    },
+    {
+      "id": "col-wall-rear-11",
+      "kind": "wall",
+      "min": [
+        20.5,
+        -3.129,
+        5.7
+      ],
+      "max": [
+        21.2,
+        -2.779,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rear-12",
+      "kind": "wall",
+      "min": [
+        21.2,
+        -3.129,
+        0.0
+      ],
+      "max": [
+        22.4,
+        -2.779,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rear-13",
+      "kind": "wall",
+      "min": [
+        22.4,
+        -3.129,
+        0.0
+      ],
+      "max": [
+        23.651,
+        -2.779,
+        1.0
+      ]
+    },
+    {
+      "id": "col-wall-rear-14",
+      "kind": "wall",
+      "min": [
+        22.4,
+        -3.129,
+        2.4
+      ],
+      "max": [
+        23.651,
+        -2.779,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rear-15",
+      "kind": "wall",
+      "min": [
+        23.651,
+        -3.129,
+        0.0
+      ],
+      "max": [
+        24.0,
+        -2.779,
+        1.0
+      ]
+    },
+    {
+      "id": "col-wall-rear-16",
+      "kind": "wall",
+      "min": [
+        23.651,
+        -3.129,
+        2.4
+      ],
+      "max": [
+        24.0,
+        -2.779,
+        4.4
+      ]
+    },
+    {
+      "id": "col-wall-rear-17",
+      "kind": "wall",
+      "min": [
+        23.651,
+        -3.129,
+        5.8
+      ],
+      "max": [
+        24.0,
+        -2.779,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rear-18",
+      "kind": "wall",
+      "min": [
+        24.0,
+        -3.129,
+        0.0
+      ],
+      "max": [
+        24.751,
+        -2.779,
+        4.4
+      ]
+    },
+    {
+      "id": "col-wall-rear-19",
+      "kind": "wall",
+      "min": [
+        24.0,
+        -3.129,
+        5.8
+      ],
+      "max": [
+        24.751,
+        -2.779,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-rear-20",
+      "kind": "wall",
+      "min": [
+        24.751,
+        -3.129,
+        0.0
+      ],
+      "max": [
+        26.603,
+        -2.779,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-court-01",
+      "kind": "wall",
+      "min": [
+        16.461,
+        -2.779,
+        0.0
+      ],
+      "max": [
+        16.811,
+        -0.758,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-link-south-01",
+      "kind": "wall",
+      "min": [
+        9.85,
+        -0.758,
+        0.0
+      ],
+      "max": [
+        10.8,
+        -0.408,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-link-south-02",
+      "kind": "wall",
+      "min": [
+        10.8,
+        -0.758,
+        0.0
+      ],
+      "max": [
+        12.4,
+        -0.408,
+        0.6
+      ]
+    },
+    {
+      "id": "col-wall-link-south-03",
+      "kind": "wall",
+      "min": [
+        10.8,
+        -0.758,
+        3.0
+      ],
+      "max": [
+        12.4,
+        -0.408,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-link-south-04",
+      "kind": "wall",
+      "min": [
+        12.4,
+        -0.758,
+        0.0
+      ],
+      "max": [
+        14.2,
+        -0.408,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-link-south-05",
+      "kind": "wall",
+      "min": [
+        14.2,
+        -0.758,
+        0.0
+      ],
+      "max": [
+        14.65,
+        -0.408,
+        0.6
+      ]
+    },
+    {
+      "id": "col-wall-link-south-06",
+      "kind": "wall",
+      "min": [
+        14.2,
+        -0.758,
+        3.0
+      ],
+      "max": [
+        14.65,
+        -0.408,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-link-south-07",
+      "kind": "wall",
+      "min": [
+        14.65,
+        -0.758,
+        0.0
+      ],
+      "max": [
+        15.75,
+        -0.408,
+        0.6
+      ]
+    },
+    {
+      "id": "col-wall-link-south-08",
+      "kind": "wall",
+      "min": [
+        14.65,
+        -0.758,
+        3.0
+      ],
+      "max": [
+        15.75,
+        -0.408,
+        4.4
+      ]
+    },
+    {
+      "id": "col-wall-link-south-09",
+      "kind": "wall",
+      "min": [
+        14.65,
+        -0.758,
+        5.8
+      ],
+      "max": [
+        15.75,
+        -0.408,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-link-south-10",
+      "kind": "wall",
+      "min": [
+        15.75,
+        -0.758,
+        0.0
+      ],
+      "max": [
+        15.8,
+        -0.408,
+        0.6
+      ]
+    },
+    {
+      "id": "col-wall-link-south-11",
+      "kind": "wall",
+      "min": [
+        15.75,
+        -0.758,
+        3.0
+      ],
+      "max": [
+        15.8,
+        -0.408,
+        7.8
+      ]
+    },
+    {
+      "id": "col-wall-link-south-12",
+      "kind": "wall",
+      "min": [
+        15.8,
+        -0.758,
+        0.0
+      ],
+      "max": [
+        16.811,
+        -0.408,
+        7.8
+      ]
+    },
+    {
+      "id": "col-door-door-front",
+      "kind": "door",
+      "min": [
+        13.682,
+        5.709,
+        0.0
+      ],
+      "max": [
+        13.732,
+        6.709,
+        2.2
+      ],
+      "openingId": "door-front"
+    },
+    {
+      "id": "col-glass-win-g-entry-n",
+      "kind": "glass",
+      "min": [
+        11.041,
+        9.625,
+        0.6
+      ],
+      "max": [
+        12.641,
+        9.665,
+        3.0
+      ],
+      "openingId": "win-g-entry-n"
+    },
+    {
+      "id": "col-glass-win-g-entry-e",
+      "kind": "glass",
+      "min": [
+        13.687,
+        7.8,
+        0.6
+      ],
+      "max": [
+        13.727,
+        8.8,
+        3.0
+      ],
+      "openingId": "win-g-entry-e"
+    },
+    {
+      "id": "col-glass-win-g-living-s1",
+      "kind": "glass",
+      "min": [
+        10.8,
+        -0.603,
+        0.6
+      ],
+      "max": [
+        12.4,
+        -0.563,
+        3.0
+      ],
+      "openingId": "win-g-living-s1"
+    },
+    {
+      "id": "col-glass-win-g-living-s2",
+      "kind": "glass",
+      "min": [
+        14.2,
+        -0.603,
+        0.6
+      ],
+      "max": [
+        15.8,
+        -0.563,
+        3.0
+      ],
+      "openingId": "win-g-living-s2"
+    },
+    {
+      "id": "col-glass-win-g-living-s3",
+      "kind": "glass",
+      "min": [
+        17.5,
+        -2.974,
+        0.6
+      ],
+      "max": [
+        18.9,
+        -2.934,
+        3.0
+      ],
+      "openingId": "win-g-living-s3"
+    },
+    {
+      "id": "col-glass-win-g-kitchen-s",
+      "kind": "glass",
+      "min": [
+        22.4,
+        -2.974,
+        1.0
+      ],
+      "max": [
+        24.0,
+        -2.934,
+        2.4
+      ],
+      "openingId": "win-g-kitchen-s"
+    },
+    {
+      "id": "col-glass-win-g-kitchen-e",
+      "kind": "glass",
+      "min": [
+        26.408,
+        0.2,
+        1.0
+      ],
+      "max": [
+        26.448,
+        2.2,
+        2.6
+      ],
+      "openingId": "win-g-kitchen-e"
+    },
+    {
+      "id": "col-glass-win-g-kitchen-n",
+      "kind": "glass",
+      "min": [
+        22.9,
+        7.271,
+        1.0
+      ],
+      "max": [
+        24.5,
+        7.311,
+        2.4
+      ],
+      "openingId": "win-g-kitchen-n"
+    },
+    {
+      "id": "col-glass-win-u-rear-bedroom",
+      "kind": "glass",
+      "min": [
+        23.651,
+        -2.974,
+        4.4
+      ],
+      "max": [
+        24.751,
+        -2.934,
+        5.8
+      ],
+      "openingId": "win-u-rear-bedroom"
+    },
+    {
+      "id": "col-glass-win-u-rear-bedroom-east",
+      "kind": "glass",
+      "min": [
+        26.408,
+        0.1,
+        4.4
+      ],
+      "max": [
+        26.448,
+        1.1,
+        5.8
+      ],
+      "openingId": "win-u-rear-bedroom-east"
+    },
+    {
+      "id": "col-glass-win-u-bath-s",
+      "kind": "glass",
+      "min": [
+        20.5,
+        -2.974,
+        4.8
+      ],
+      "max": [
+        21.2,
+        -2.934,
+        5.7
+      ],
+      "openingId": "win-u-bath-s"
+    },
+    {
+      "id": "col-glass-win-u-study-s1",
+      "kind": "glass",
+      "min": [
+        17.65,
+        -2.974,
+        4.4
+      ],
+      "max": [
+        18.75,
+        -2.934,
+        5.8
+      ],
+      "openingId": "win-u-study-s1"
+    },
+    {
+      "id": "col-glass-win-u-study-s2",
+      "kind": "glass",
+      "min": [
+        14.65,
+        -0.603,
+        4.4
+      ],
+      "max": [
+        15.75,
+        -0.563,
+        5.8
+      ],
+      "openingId": "win-u-study-s2"
+    },
+    {
+      "id": "col-glass-win-u-front-bedroom-e",
+      "kind": "glass",
+      "min": [
+        26.408,
+        4.05,
+        4.4
+      ],
+      "max": [
+        26.448,
+        5.15,
+        5.8
+      ],
+      "openingId": "win-u-front-bedroom-e"
+    },
+    {
+      "id": "col-glass-win-u-front-bedroom-n",
+      "kind": "glass",
+      "min": [
+        23.15,
+        7.271,
+        4.4
+      ],
+      "max": [
+        24.25,
+        7.311,
+        5.8
+      ],
+      "openingId": "win-u-front-bedroom-n"
+    },
+    {
+      "id": "col-mass-ra-upper",
+      "kind": "wall",
+      "min": [
+        9.85,
+        -0.758,
+        3.25
+      ],
+      "max": [
+        13.882,
+        9.82,
+        6.9
+      ]
+    },
+    {
+      "id": "col-roof-entrance-canopy",
+      "kind": "roof",
+      "min": [
+        13.882,
+        5.219,
+        2.92
+      ],
+      "max": [
+        15.482,
+        7.199,
+        3.46
+      ]
+    },
+    {
+      "id": "col-roof-skylight-1",
+      "kind": "roof",
+      "min": [
+        22.4,
+        0.4,
+        6.9
+      ],
+      "max": [
+        25.4,
+        3.4,
+        7.7
+      ]
+    },
+    {
+      "id": "col-roof-skylight-2",
+      "kind": "roof",
+      "min": [
+        23.15,
+        1.15,
+        7.7
+      ],
+      "max": [
+        24.65,
+        2.65,
+        8.45
+      ]
+    },
+    {
+      "id": "col-wall-g-seal-west-01",
+      "kind": "wall",
+      "min": [
+        9.85,
+        -0.408,
+        0.0
+      ],
+      "max": [
+        10.15,
+        9.47,
+        3.25
+      ]
+    },
+    {
+      "id": "col-wall-g-entry-living-01",
+      "kind": "wall",
+      "min": [
+        10.15,
+        3.007,
+        0.0
+      ],
+      "max": [
+        11.35,
+        3.157,
+        3.25
+      ]
+    },
+    {
+      "id": "col-wall-g-entry-living-02",
+      "kind": "wall",
+      "min": [
+        11.35,
+        3.007,
+        2.2
+      ],
+      "max": [
+        12.35,
+        3.157,
+        3.25
+      ]
+    },
+    {
+      "id": "col-wall-g-entry-living-03",
+      "kind": "wall",
+      "min": [
+        12.35,
+        3.007,
+        0.0
+      ],
+      "max": [
+        19.552,
+        3.157,
+        3.25
+      ]
+    },
+    {
+      "id": "col-wall-g-living-kitchen-01",
+      "kind": "wall",
+      "min": [
+        19.552,
+        -2.779,
+        0.0
+      ],
+      "max": [
+        19.702,
+        0.15,
+        3.25
+      ]
+    },
+    {
+      "id": "col-wall-g-living-kitchen-02",
+      "kind": "wall",
+      "min": [
+        19.552,
+        0.15,
+        2.1
+      ],
+      "max": [
+        19.702,
+        1.05,
+        3.25
+      ]
+    },
+    {
+      "id": "col-wall-g-living-kitchen-03",
+      "kind": "wall",
+      "min": [
+        19.552,
+        1.05,
+        0.0
+      ],
+      "max": [
+        19.702,
+        4.357,
+        3.25
+      ]
+    },
+    {
+      "id": "col-wall-u-stair-study-01",
+      "kind": "wall",
+      "min": [
+        13.882,
+        3.007,
+        3.6
+      ],
+      "max": [
+        19.552,
+        3.157,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-hall-study-01",
+      "kind": "wall",
+      "min": [
+        19.552,
+        -2.779,
+        3.6
+      ],
+      "max": [
+        19.702,
+        0.75,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-hall-study-02",
+      "kind": "wall",
+      "min": [
+        19.552,
+        0.75,
+        5.7
+      ],
+      "max": [
+        19.702,
+        1.65,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-hall-study-03",
+      "kind": "wall",
+      "min": [
+        19.552,
+        1.65,
+        3.6
+      ],
+      "max": [
+        19.702,
+        3.157,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-hall-bedrooms-01",
+      "kind": "wall",
+      "min": [
+        22.0,
+        -2.779,
+        3.6
+      ],
+      "max": [
+        22.15,
+        0.15,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-hall-bedrooms-02",
+      "kind": "wall",
+      "min": [
+        22.0,
+        0.15,
+        5.7
+      ],
+      "max": [
+        22.15,
+        0.95,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-hall-bedrooms-03",
+      "kind": "wall",
+      "min": [
+        22.0,
+        0.95,
+        3.6
+      ],
+      "max": [
+        22.15,
+        2.75,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-hall-bedrooms-04",
+      "kind": "wall",
+      "min": [
+        22.0,
+        2.75,
+        5.7
+      ],
+      "max": [
+        22.15,
+        3.65,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-hall-bedrooms-05",
+      "kind": "wall",
+      "min": [
+        22.0,
+        3.65,
+        3.6
+      ],
+      "max": [
+        22.15,
+        4.507,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-bedrooms-01",
+      "kind": "wall",
+      "min": [
+        22.15,
+        1.45,
+        3.6
+      ],
+      "max": [
+        26.253,
+        1.6,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-bath-hall-01",
+      "kind": "wall",
+      "min": [
+        19.702,
+        -0.35,
+        3.6
+      ],
+      "max": [
+        20.45,
+        -0.2,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-bath-hall-02",
+      "kind": "wall",
+      "min": [
+        20.45,
+        -0.35,
+        5.7
+      ],
+      "max": [
+        21.25,
+        -0.2,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-bath-hall-03",
+      "kind": "wall",
+      "min": [
+        21.25,
+        -0.35,
+        3.6
+      ],
+      "max": [
+        22.0,
+        -0.2,
+        6.5
+      ]
+    },
+    {
+      "id": "col-wall-u-hall-front-01",
+      "kind": "wall",
+      "min": [
+        21.183,
+        4.357,
+        3.6
+      ],
+      "max": [
+        22.0,
+        4.507,
+        6.5
+      ]
+    },
+    {
+      "id": "col-door-door-u-front-bedroom",
+      "kind": "door",
+      "min": [
+        22.05,
+        2.75,
+        3.6
+      ],
+      "max": [
+        22.1,
+        3.65,
+        5.7
+      ],
+      "openingId": "door-u-front-bedroom"
+    },
+    {
+      "id": "col-floor-f1-01",
+      "kind": "floor",
+      "min": [
+        13.882,
+        -0.408,
+        3.25
+      ],
+      "max": [
+        26.253,
+        3.157,
+        3.6
+      ]
+    },
+    {
+      "id": "col-floor-f1-02",
+      "kind": "floor",
+      "min": [
+        19.552,
+        3.157,
+        3.25
+      ],
+      "max": [
+        26.253,
+        4.357,
+        3.6
+      ]
+    },
+    {
+      "id": "col-floor-f1-03",
+      "kind": "floor",
+      "min": [
+        16.811,
+        -2.779,
+        3.25
+      ],
+      "max": [
+        26.253,
+        -0.408,
+        3.6
+      ]
+    },
+    {
+      "id": "col-floor-f1-04",
+      "kind": "floor",
+      "min": [
+        21.183,
+        4.357,
+        3.25
+      ],
+      "max": [
+        26.253,
+        7.116,
+        3.6
+      ]
+    },
+    {
+      "id": "col-ceiling-f1-01",
+      "kind": "ceiling",
+      "min": [
+        13.882,
+        -0.408,
+        6.5
+      ],
+      "max": [
+        26.253,
+        4.357,
+        6.9
+      ]
+    },
+    {
+      "id": "col-ceiling-f1-02",
+      "kind": "ceiling",
+      "min": [
+        16.811,
+        -2.779,
+        6.5
+      ],
+      "max": [
+        26.253,
+        -0.408,
+        6.9
+      ]
+    },
+    {
+      "id": "col-ceiling-f1-03",
+      "kind": "ceiling",
+      "min": [
+        21.183,
+        4.357,
+        6.5
+      ],
+      "max": [
+        26.253,
+        7.116,
+        6.9
+      ]
+    },
+    {
+      "id": "col-stair-01",
+      "kind": "stair",
+      "min": [
+        14.232,
+        3.157,
+        0.0
+      ],
+      "max": [
+        14.512,
+        4.357,
+        0.18
+      ]
+    },
+    {
+      "id": "col-stair-02",
+      "kind": "stair",
+      "min": [
+        14.512,
+        3.157,
+        0.0
+      ],
+      "max": [
+        14.792,
+        4.357,
+        0.36
+      ]
+    },
+    {
+      "id": "col-stair-03",
+      "kind": "stair",
+      "min": [
+        14.792,
+        3.157,
+        0.0
+      ],
+      "max": [
+        15.072,
+        4.357,
+        0.54
+      ]
+    },
+    {
+      "id": "col-stair-04",
+      "kind": "stair",
+      "min": [
+        15.072,
+        3.157,
+        0.0
+      ],
+      "max": [
+        15.352,
+        4.357,
+        0.72
+      ]
+    },
+    {
+      "id": "col-stair-05",
+      "kind": "stair",
+      "min": [
+        15.352,
+        3.157,
+        0.0
+      ],
+      "max": [
+        15.632,
+        4.357,
+        0.9
+      ]
+    },
+    {
+      "id": "col-stair-06",
+      "kind": "stair",
+      "min": [
+        15.632,
+        3.157,
+        0.0
+      ],
+      "max": [
+        15.912,
+        4.357,
+        1.08
+      ]
+    },
+    {
+      "id": "col-stair-07",
+      "kind": "stair",
+      "min": [
+        15.912,
+        3.157,
+        0.0
+      ],
+      "max": [
+        16.192,
+        4.357,
+        1.26
+      ]
+    },
+    {
+      "id": "col-stair-08",
+      "kind": "stair",
+      "min": [
+        16.192,
+        3.157,
+        0.0
+      ],
+      "max": [
+        16.472,
+        4.357,
+        1.44
+      ]
+    },
+    {
+      "id": "col-stair-09",
+      "kind": "stair",
+      "min": [
+        16.472,
+        3.157,
+        0.0
+      ],
+      "max": [
+        16.752,
+        4.357,
+        1.62
+      ]
+    },
+    {
+      "id": "col-stair-10",
+      "kind": "stair",
+      "min": [
+        16.752,
+        3.157,
+        0.0
+      ],
+      "max": [
+        17.032,
+        4.357,
+        1.8
+      ]
+    },
+    {
+      "id": "col-stair-11",
+      "kind": "stair",
+      "min": [
+        17.032,
+        3.157,
+        0.0
+      ],
+      "max": [
+        17.312,
+        4.357,
+        1.98
+      ]
+    },
+    {
+      "id": "col-stair-12",
+      "kind": "stair",
+      "min": [
+        17.312,
+        3.157,
+        0.0
+      ],
+      "max": [
+        17.592,
+        4.357,
+        2.16
+      ]
+    },
+    {
+      "id": "col-stair-13",
+      "kind": "stair",
+      "min": [
+        17.592,
+        3.157,
+        0.0
+      ],
+      "max": [
+        17.872,
+        4.357,
+        2.34
+      ]
+    },
+    {
+      "id": "col-stair-14",
+      "kind": "stair",
+      "min": [
+        17.872,
+        3.157,
+        0.0
+      ],
+      "max": [
+        18.152,
+        4.357,
+        2.52
+      ]
+    },
+    {
+      "id": "col-stair-15",
+      "kind": "stair",
+      "min": [
+        18.152,
+        3.157,
+        0.0
+      ],
+      "max": [
+        18.432,
+        4.357,
+        2.7
+      ]
+    },
+    {
+      "id": "col-stair-16",
+      "kind": "stair",
+      "min": [
+        18.432,
+        3.157,
+        0.0
+      ],
+      "max": [
+        18.712,
+        4.357,
+        2.88
+      ]
+    },
+    {
+      "id": "col-stair-17",
+      "kind": "stair",
+      "min": [
+        18.712,
+        3.157,
+        0.0
+      ],
+      "max": [
+        18.992,
+        4.357,
+        3.06
+      ]
+    },
+    {
+      "id": "col-stair-18",
+      "kind": "stair",
+      "min": [
+        18.992,
+        3.157,
+        0.0
+      ],
+      "max": [
+        19.272,
+        4.357,
+        3.24
+      ]
+    },
+    {
+      "id": "col-stair-19",
+      "kind": "stair",
+      "min": [
+        19.272,
+        3.157,
+        0.0
+      ],
+      "max": [
+        19.552,
+        4.357,
+        3.42
+      ]
+    },
+    {
+      "id": "col-furn-u-rear-bedroom-bed",
+      "kind": "furniture",
+      "min": [
+        24.1,
+        -1.92,
+        3.6
+      ],
+      "max": [
+        26.2,
+        -0.28,
+        4.22
+      ]
+    },
+    {
+      "id": "col-furn-u-rear-bedroom-bed-headboard",
+      "kind": "furniture",
+      "min": [
+        26.1,
+        -1.9,
+        3.6
+      ],
+      "max": [
+        26.2,
+        -0.3,
+        4.35
+      ]
+    },
+    {
+      "id": "col-furn-u-rear-bedroom-nightstand",
+      "kind": "furniture",
+      "min": [
+        25.65,
+        0.0,
+        3.6
+      ],
+      "max": [
+        26.2,
+        0.45,
+        4.15
+      ]
+    },
+    {
+      "id": "col-furn-u-rear-bedroom-wardrobe",
+      "kind": "furniture",
+      "min": [
+        22.2,
+        -2.73,
+        3.6
+      ],
+      "max": [
+        22.8,
+        -1.53,
+        5.6
+      ]
+    },
+    {
+      "id": "col-furn-u-rear-bedroom-desk",
+      "kind": "furniture",
+      "min": [
+        22.2,
+        -1.3,
+        3.6
+      ],
+      "max": [
+        22.8,
+        -0.1,
+        4.36
+      ]
+    },
+    {
+      "id": "col-furn-u-rear-bedroom-chair",
+      "kind": "furniture",
+      "min": [
+        22.85,
+        -0.95,
+        3.6
+      ],
+      "max": [
+        23.3,
+        -0.5,
+        4.5
+      ]
+    },
+    {
+      "id": "col-furn-u-rear-bedroom-laundry",
+      "kind": "furniture",
+      "min": [
+        23.4,
+        0.6,
+        3.6
+      ],
+      "max": [
+        24.0,
+        1.2,
+        4.0
+      ]
+    },
+    {
+      "id": "col-furn-u-rear-bedroom-boxes",
+      "kind": "furniture",
+      "min": [
+        24.6,
+        0.7,
+        3.6
+      ],
+      "max": [
+        25.2,
+        1.3,
+        4.2
+      ]
+    },
+    {
+      "id": "col-furn-u-front-bedroom-bed",
+      "kind": "furniture",
+      "min": [
+        23.38,
+        1.75,
+        3.6
+      ],
+      "max": [
+        25.02,
+        3.77,
+        4.22
+      ]
+    },
+    {
+      "id": "col-furn-u-front-bedroom-bed-headboard",
+      "kind": "furniture",
+      "min": [
+        23.4,
+        1.65,
+        3.6
+      ],
+      "max": [
+        25.0,
+        1.75,
+        4.55
+      ]
+    },
+    {
+      "id": "col-furn-u-front-bedroom-wardrobe",
+      "kind": "furniture",
+      "min": [
+        21.3,
+        6.5,
+        3.6
+      ],
+      "max": [
+        22.5,
+        7.06,
+        5.6
+      ]
+    },
+    {
+      "id": "col-furn-u-front-bedroom-dresser",
+      "kind": "furniture",
+      "min": [
+        25.65,
+        5.2,
+        3.6
+      ],
+      "max": [
+        26.2,
+        6.4,
+        4.5
+      ]
+    },
+    {
+      "id": "col-furn-u-front-bedroom-chair",
+      "kind": "furniture",
+      "min": [
+        25.4,
+        2.4,
+        3.6
+      ],
+      "max": [
+        25.85,
+        2.85,
+        4.5
+      ]
+    },
+    {
+      "id": "col-furn-u-bath-tub",
+      "kind": "furniture",
+      "min": [
+        19.75,
+        -2.73,
+        3.6
+      ],
+      "max": [
+        21.45,
+        -2.03,
+        4.15
+      ]
+    },
+    {
+      "id": "col-furn-u-bath-toilet",
+      "kind": "furniture",
+      "min": [
+        21.45,
+        -1.9,
+        3.6
+      ],
+      "max": [
+        21.95,
+        -1.3,
+        4.4
+      ]
+    },
+    {
+      "id": "col-furn-u-bath-vanity",
+      "kind": "furniture",
+      "min": [
+        19.75,
+        -1.65,
+        3.6
+      ],
+      "max": [
+        20.3,
+        -0.75,
+        4.45
+      ]
+    },
+    {
+      "id": "col-furn-u-study-desk",
+      "kind": "furniture",
+      "min": [
+        14.0,
+        2.3,
+        3.6
+      ],
+      "max": [
+        15.6,
+        2.95,
+        4.36
+      ]
+    },
+    {
+      "id": "col-furn-u-study-chair",
+      "kind": "furniture",
+      "min": [
+        14.55,
+        1.7,
+        3.6
+      ],
+      "max": [
+        15.0,
+        2.15,
+        4.5
+      ]
+    },
+    {
+      "id": "col-furn-u-study-bookshelf",
+      "kind": "furniture",
+      "min": [
+        16.6,
+        2.62,
+        3.6
+      ],
+      "max": [
+        18.4,
+        2.97,
+        5.6
+      ]
+    },
+    {
+      "id": "col-furn-u-study-boxes",
+      "kind": "furniture",
+      "min": [
+        17.6,
+        -2.6,
+        3.6
+      ],
+      "max": [
+        18.4,
+        -1.9,
+        4.1
+      ]
+    },
+    {
+      "id": "col-furn-u-study-daybed",
+      "kind": "furniture",
+      "min": [
+        14.1,
+        -0.33,
+        3.6
+      ],
+      "max": [
+        16.1,
+        0.52,
+        4.4
+      ]
+    },
+    {
+      "id": "col-furn-g-entry-bench",
+      "kind": "furniture",
+      "min": [
+        10.25,
+        5.4,
+        0.0
+      ],
+      "max": [
+        10.7,
+        6.9,
+        0.45
+      ]
+    },
+    {
+      "id": "col-furn-g-entry-coat-rack",
+      "kind": "furniture",
+      "min": [
+        10.25,
+        8.5,
+        0.0
+      ],
+      "max": [
+        10.65,
+        9.3,
+        1.8
+      ]
+    },
+    {
+      "id": "col-furn-g-entry-shoe-cabinet",
+      "kind": "furniture",
+      "min": [
+        12.75,
+        8.95,
+        0.0
+      ],
+      "max": [
+        13.45,
+        9.42,
+        0.9
+      ]
+    },
+    {
+      "id": "col-furn-g-living-sofa",
+      "kind": "furniture",
+      "min": [
+        10.6,
+        -0.36,
+        0.0
+      ],
+      "max": [
+        12.8,
+        0.54,
+        0.85
+      ]
+    },
+    {
+      "id": "col-furn-g-living-coffee-table",
+      "kind": "furniture",
+      "min": [
+        11.1,
+        1.0,
+        0.0
+      ],
+      "max": [
+        12.3,
+        1.6,
+        0.45
+      ]
+    },
+    {
+      "id": "col-furn-g-living-armchair",
+      "kind": "furniture",
+      "min": [
+        13.4,
+        0.3,
+        0.0
+      ],
+      "max": [
+        14.2,
+        1.1,
+        0.85
+      ]
+    },
+    {
+      "id": "col-furn-g-living-tv",
+      "kind": "furniture",
+      "min": [
+        14.6,
+        2.55,
+        0.0
+      ],
+      "max": [
+        16.2,
+        2.95,
+        1.25
+      ]
+    },
+    {
+      "id": "col-furn-g-living-bookshelf",
+      "kind": "furniture",
+      "min": [
+        16.9,
+        -2.7,
+        0.0
+      ],
+      "max": [
+        17.3,
+        -1.2,
+        2.0
+      ]
+    },
+    {
+      "id": "col-furn-g-living-plant",
+      "kind": "furniture",
+      "min": [
+        18.75,
+        -2.75,
+        0.0
+      ],
+      "max": [
+        19.45,
+        -2.05,
+        1.2
+      ]
+    },
+    {
+      "id": "col-furn-g-kitchen-counter-east",
+      "kind": "furniture",
+      "min": [
+        25.62,
+        -2.75,
+        0.0
+      ],
+      "max": [
+        26.23,
+        3.6,
+        0.92
+      ]
+    },
+    {
+      "id": "col-furn-g-kitchen-counter-south",
+      "kind": "furniture",
+      "min": [
+        22.0,
+        -2.75,
+        0.0
+      ],
+      "max": [
+        25.65,
+        -2.12,
+        0.92
+      ]
+    },
+    {
+      "id": "col-furn-g-kitchen-fridge",
+      "kind": "furniture",
+      "min": [
+        19.75,
+        -2.75,
+        0.0
+      ],
+      "max": [
+        20.5,
+        -2.05,
+        1.85
+      ]
+    },
+    {
+      "id": "col-furn-g-kitchen-island",
+      "kind": "furniture",
+      "min": [
+        22.55,
+        -0.65,
+        0.0
+      ],
+      "max": [
+        24.65,
+        0.45,
+        0.92
+      ]
+    },
+    {
+      "id": "col-furn-g-kitchen-table",
+      "kind": "furniture",
+      "min": [
+        22.4,
+        2.6,
+        0.0
+      ],
+      "max": [
+        24.2,
+        3.6,
+        0.76
+      ]
+    },
+    {
+      "id": "col-furn-g-kitchen-chair-1",
+      "kind": "furniture",
+      "min": [
+        22.6,
+        2.05,
+        0.0
+      ],
+      "max": [
+        23.05,
+        2.5,
+        0.95
+      ]
+    },
+    {
+      "id": "col-furn-g-kitchen-chair-2",
+      "kind": "furniture",
+      "min": [
+        23.55,
+        2.05,
+        0.0
+      ],
+      "max": [
+        24.0,
+        2.5,
+        0.95
+      ]
+    },
+    {
+      "id": "col-furn-g-kitchen-chair-3",
+      "kind": "furniture",
+      "min": [
+        22.6,
+        3.7,
+        0.0
+      ],
+      "max": [
+        23.05,
+        4.15,
+        0.95
+      ]
+    },
+    {
+      "id": "col-furn-g-kitchen-chair-4",
+      "kind": "furniture",
+      "min": [
+        23.55,
+        3.7,
+        0.0
+      ],
+      "max": [
+        24.0,
+        4.15,
+        0.95
+      ]
+    },
+    {
+      "id": "col-furn-g-kitchen-boxes",
+      "kind": "furniture",
+      "min": [
+        21.3,
+        6.4,
+        0.0
+      ],
+      "max": [
+        22.1,
+        7.05,
+        0.7
+      ]
+    },
+    {
+      "id": "col-furn-g-kitchen-bin",
+      "kind": "furniture",
+      "min": [
+        20.0,
+        3.8,
+        0.0
+      ],
+      "max": [
+        20.4,
+        4.2,
+        0.7
+      ]
+    },
+    {
+      "id": "col-tree-north-1-trunk",
+      "kind": "tree",
+      "min": [
+        -10.78,
+        18.72,
+        0.0
+      ],
+      "max": [
+        -10.22,
+        19.28,
+        3.952
+      ]
+    },
+    {
+      "id": "col-tree-north-1-canopy",
+      "kind": "tree",
+      "min": [
+        -13.38,
+        16.12,
+        3.952
+      ],
+      "max": [
+        -7.62,
+        21.88,
+        8.848
+      ]
+    },
+    {
+      "id": "col-tree-north-2-trunk",
+      "kind": "tree",
+      "min": [
+        4.74,
+        22.24,
+        0.0
+      ],
+      "max": [
+        5.26,
+        22.76,
+        3.756
+      ]
+    },
+    {
+      "id": "col-tree-north-2-canopy",
+      "kind": "tree",
+      "min": [
+        2.36,
+        19.86,
+        3.756
+      ],
+      "max": [
+        7.64,
+        25.14,
+        8.244
+      ]
+    },
+    {
+      "id": "col-tree-north-3-trunk",
+      "kind": "tree",
+      "min": [
+        -23.72,
+        25.78,
+        0.0
+      ],
+      "max": [
+        -23.28,
+        26.22,
+        3.496
+      ]
+    },
+    {
+      "id": "col-tree-north-3-canopy",
+      "kind": "tree",
+      "min": [
+        -25.74,
+        23.76,
+        3.496
+      ],
+      "max": [
+        -21.26,
+        28.24,
+        7.304
+      ]
+    },
+    {
+      "id": "col-tree-east-1-trunk",
+      "kind": "tree",
+      "min": [
+        33.4,
+        21.8,
+        0.0
+      ],
+      "max": [
+        33.8,
+        22.2,
+        3.832
+      ]
+    },
+    {
+      "id": "col-tree-east-1-canopy",
+      "kind": "tree",
+      "min": [
+        31.52,
+        19.92,
+        3.832
+      ],
+      "max": [
+        35.68,
+        24.08,
+        7.368
+      ]
+    },
+    {
+      "id": "col-tree-east-2-trunk",
+      "kind": "tree",
+      "min": [
+        33.4,
+        3.8,
+        0.0
+      ],
+      "max": [
+        33.8,
+        4.2,
+        3.832
+      ]
+    },
+    {
+      "id": "col-tree-east-2-canopy",
+      "kind": "tree",
+      "min": [
+        31.52,
+        1.92,
+        3.832
+      ],
+      "max": [
+        35.68,
+        6.08,
+        7.368
+      ]
+    },
+    {
+      "id": "col-tree-east-3-trunk",
+      "kind": "tree",
+      "min": [
+        33.4,
+        -13.2,
+        0.0
+      ],
+      "max": [
+        33.8,
+        -12.8,
+        3.832
+      ]
+    },
+    {
+      "id": "col-tree-east-3-canopy",
+      "kind": "tree",
+      "min": [
+        31.52,
+        -15.08,
+        3.832
+      ],
+      "max": [
+        35.68,
+        -10.92,
+        7.368
+      ]
+    },
+    {
+      "id": "col-tree-obstacle-trunk",
+      "kind": "tree",
+      "min": [
+        29.66,
+        7.86,
+        0.0
+      ],
+      "max": [
+        29.94,
+        8.14,
+        3.044
+      ]
+    },
+    {
+      "id": "col-tree-obstacle-canopy",
+      "kind": "tree",
+      "min": [
+        28.44,
+        6.64,
+        3.044
+      ],
+      "max": [
+        31.16,
+        9.36,
+        5.356
+      ]
+    },
+    {
+      "id": "col-tree-south-1-trunk",
+      "kind": "tree",
+      "min": [
+        0.7,
+        -20.3,
+        0.0
+      ],
+      "max": [
+        1.3,
+        -19.7,
+        4.016
+      ]
+    },
+    {
+      "id": "col-tree-south-1-canopy",
+      "kind": "tree",
+      "min": [
+        -2.04,
+        -23.04,
+        4.016
+      ],
+      "max": [
+        4.04,
+        -16.96,
+        9.184
+      ]
+    },
+    {
+      "id": "col-tree-west-1-trunk",
+      "kind": "tree",
+      "min": [
+        -24.22,
+        11.78,
+        0.0
+      ],
+      "max": [
+        -23.78,
+        12.22,
+        3.464
+      ]
+    },
+    {
+      "id": "col-tree-west-1-canopy",
+      "kind": "tree",
+      "min": [
+        -26.16,
+        9.84,
+        3.464
+      ],
+      "max": [
+        -21.84,
+        14.16,
+        7.136
+      ]
+    },
+    {
+      "id": "col-conifer-west-1-trunk",
+      "kind": "tree",
+      "min": [
+        -24.68,
+        -6.18,
+        0.0
+      ],
+      "max": [
+        -24.32,
+        -5.82,
+        1.2
+      ]
+    },
+    {
+      "id": "col-conifer-west-1-canopy",
+      "kind": "tree",
+      "min": [
+        -25.9,
+        -7.4,
+        1.2
+      ],
+      "max": [
+        -23.1,
+        -4.6,
+        4.94
+      ]
+    },
+    {
+      "id": "col-conifer-west-1-top",
+      "kind": "tree",
+      "min": [
+        -25.1,
+        -6.6,
+        4.94
+      ],
+      "max": [
+        -23.9,
+        -5.4,
+        7.5
+      ]
+    },
+    {
+      "id": "col-conifer-south-1-trunk",
+      "kind": "tree",
+      "min": [
+        -24.2,
+        -21.2,
+        0.0
+      ],
+      "max": [
+        -23.8,
+        -20.8,
+        1.2
+      ]
+    },
+    {
+      "id": "col-conifer-south-1-canopy",
+      "kind": "tree",
+      "min": [
+        -25.54,
+        -22.54,
+        1.2
+      ],
+      "max": [
+        -22.46,
+        -19.46,
+        5.49
+      ]
+    },
+    {
+      "id": "col-conifer-south-1-top",
+      "kind": "tree",
+      "min": [
+        -24.66,
+        -21.66,
+        5.49
+      ],
+      "max": [
+        -23.34,
+        -20.34,
+        8.5
+      ]
+    },
+    {
+      "id": "col-shrub-01",
+      "kind": "tree",
+      "min": [
+        23.065,
+        7.79,
+        0.0
+      ],
+      "max": [
+        24.935,
+        8.81,
+        1.02
+      ]
+    },
+    {
+      "id": "col-shrub-02",
+      "kind": "tree",
+      "min": [
+        26.89,
+        2.065,
+        0.0
+      ],
+      "max": [
+        27.91,
+        3.935,
+        1.02
+      ]
+    },
+    {
+      "id": "col-shrub-03",
+      "kind": "tree",
+      "min": [
+        26.89,
+        -2.45,
+        0.0
+      ],
+      "max": [
+        27.91,
+        -0.75,
+        0.935
+      ]
+    },
+    {
+      "id": "col-shrub-04",
+      "kind": "tree",
+      "min": [
+        -7.02,
+        10.19,
+        0.0
+      ],
+      "max": [
+        -4.98,
+        11.21,
+        1.02
+      ]
+    },
+    {
+      "id": "col-shrub-05",
+      "kind": "tree",
+      "min": [
+        0.98,
+        10.19,
+        0.0
+      ],
+      "max": [
+        3.02,
+        11.21,
+        1.02
+      ]
+    },
+    {
+      "id": "col-shrub-06",
+      "kind": "tree",
+      "min": [
+        10.95,
+        10.19,
+        0.0
+      ],
+      "max": [
+        12.65,
+        11.21,
+        0.935
+      ]
+    },
+    {
+      "id": "col-sf-lamp-1",
+      "kind": "street_furniture",
+      "min": [
+        -12.24,
+        34.36,
+        0.0
+      ],
+      "max": [
+        -11.76,
+        34.84,
+        4.98
+      ]
+    },
+    {
+      "id": "col-sf-lamp-2",
+      "kind": "street_furniture",
+      "min": [
+        13.76,
+        34.36,
+        0.0
+      ],
+      "max": [
+        14.24,
+        34.84,
+        4.98
+      ]
+    },
+    {
+      "id": "col-sf-lamp-3",
+      "kind": "street_furniture",
+      "min": [
+        24.26,
+        11.36,
+        0.0
+      ],
+      "max": [
+        24.74,
+        11.84,
+        4.98
+      ]
+    },
+    {
+      "id": "col-sf-bench",
+      "kind": "street_furniture",
+      "min": [
+        18.4,
+        10.6,
+        0.0
+      ],
+      "max": [
+        20.0,
+        11.08,
+        0.88
+      ]
+    },
+    {
+      "id": "col-sf-litter-bin",
+      "kind": "street_furniture",
+      "min": [
+        14.07,
+        9.02,
+        0.0
+      ],
+      "max": [
+        14.63,
+        9.58,
+        0.95
+      ]
+    },
+    {
+      "id": "col-sf-hydrant",
+      "kind": "street_furniture",
+      "min": [
+        -21.342,
+        48.955,
+        0.0
+      ],
+      "max": [
+        -20.862,
+        49.295,
+        0.7
+      ]
+    },
+    {
+      "id": "col-sf-wheelie-bin-1",
+      "kind": "street_furniture",
+      "min": [
+        -20.2,
+        -12.6,
+        0.0
+      ],
+      "max": [
+        -19.5,
+        -11.98,
+        1.05
+      ]
+    },
+    {
+      "id": "col-sf-wheelie-bin-2",
+      "kind": "street_furniture",
+      "min": [
+        -20.2,
+        -13.4,
+        0.0
+      ],
+      "max": [
+        -19.5,
+        -12.78,
+        1.05
+      ]
+    },
+    {
+      "id": "col-sf-wheelie-bin-3",
+      "kind": "street_furniture",
+      "min": [
+        -20.2,
+        -14.2,
+        0.0
+      ],
+      "max": [
+        -19.5,
+        -13.58,
+        1.05
+      ]
+    }
+  ],
+  "exits": [
+    {
+      "id": "exit-front-door",
+      "openingId": "door-front"
+    }
+  ],
+  "assemblyPoint": {
+    "id": "assembly-point",
+    "min": [
+      16.0,
+      22.5,
+      0.0
+    ],
+    "max": [
+      22.0,
+      28.5,
+      2.5
+    ]
+  },
+  "launchPoint": {
+    "position": [
+      30.5,
+      28.0,
+      0.1
+    ],
+    "yawRad": -1.5708
+  },
+  "scenarioAnchors": {
+    "scenarioOnly": true,
+    "note": "Scenario initialization only; never part of the planner's map prior.",
+    "fireOrigin": [
+      20.85,
+      2.1,
+      3.6
+    ],
+    "occupantStart": [
+      23.7,
+      0.2,
+      3.6
+    ]
+  },
+  "drone": {
+    "spanM": 0.55,
+    "heightM": 0.2,
+    "camera": {
+      "positionBody": [
+        0.135,
+        0.0,
+        0.01
+      ],
+      "pitchRad": 0.0,
+      "horizontalFovDeg": 90.0
+    }
+  },
+  "bounds": {
+    "min": [
+      -48.0,
+      -34.0,
+      -0.15
+    ],
+    "max": [
+      62.0,
+      58.0,
+      12.097
+    ]
+  },
+  "assets": {
+    "scene.glb": {
+      "sha256": "316f799863145be08defdb4dc68abd4f39c0b16cd1fab79f903ba65f7cab8a06",
+      "bytes": 936504,
+      "triangles": 15298
+    },
+    "colliders.glb": {
+      "sha256": "8469c0004ed6861fccf13d17f18b5c469d42134920798b71ce8dc3964774e23b",
+      "bytes": 346680,
+      "triangles": 3526
+    }
+  }
+}
