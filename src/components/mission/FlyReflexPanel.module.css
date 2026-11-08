@@ -1,0 +1,380 @@
+/*
+ * Fly reflex view: the controller's input frame with the image columns each sector reads, the left / centre / right
+ * meters beside it, then the move (callouts above a top-down diagram). A wide panel keeps the three parts in one row;
+ * the narrow decision column puts the move under the frame and meters. Motion is opt-in (prefers-reduced-motion).
+ */
+.view {
+  container-type: inline-size;
+  margin: 2px 0 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px 16px;
+}
+
+@container (min-width: 560px) {
+  .grid {
+    grid-template-columns: minmax(0, 1.9fr) minmax(190px, 1fr);
+    align-items: start;
+  }
+}
+
+/* Frame and meters share one row height: the frame sets it, the meters stretch to it. */
+.sense {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+
+.frameBox {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-self: flex-start;
+}
+
+.frameBox :global(.reflex-frame) {
+  max-width: none;
+}
+
+.bands {
+  position: absolute;
+  inset: 1px;
+  overflow: hidden;
+  border-radius: 5px;
+  pointer-events: none;
+}
+
+.band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-inline: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  opacity: calc(0.07 + var(--level, 0) * 0.48);
+}
+
+.bands[data-measured="false"] .band {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--muted) 45%, transparent);
+}
+
+.bands[data-measured="false"] .band::before {
+  opacity: 0;
+}
+
+.bandLabel {
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  translate: -50% 0;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: rgba(9, 9, 9, .78);
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.frameNote {
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  max-width: calc(100% - 12px);
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(5, 5, 5, .82);
+  color: var(--fixture);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.meters {
+  flex: none;
+  width: 78px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metersTitle {
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.metersUnit {
+  display: block;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.meterBars,
+.meterLetters,
+.meterValues {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  text-align: center;
+}
+
+.meterBars {
+  flex: 1;
+  min-height: 28px;
+  border-bottom: 1px solid var(--line);
+}
+
+.meter {
+  position: relative;
+  justify-self: center;
+  width: 12px;
+  height: 100%;
+  border-radius: 4px 4px 0 0;
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+}
+
+.meterFill {
+  position: absolute;
+  inset: auto 0 0;
+  height: calc(var(--level, 0) * 100%);
+  border-radius: 4px 4px 0 0;
+  background: var(--accent);
+}
+
+.meters[data-measured="false"] .meterFill {
+  display: none;
+}
+
+.meterLetters {
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.meterValues {
+  font-size: 10px;
+  line-height: 1.1;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The move: callouts above the diagram. */
+.move {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.callouts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+}
+
+.chip {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 6px;
+  padding: 4px 11px 5px 12px;
+  border-radius: 6px;
+  background: var(--warm-panel);
+  box-shadow: inset 3px 0 0 var(--accent);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.chip[data-tone="hold"] {
+  background: var(--raised);
+  box-shadow: inset 3px 0 0 var(--muted);
+}
+
+.chip[data-tone="other"] {
+  box-shadow: inset 3px 0 0 var(--alert);
+}
+
+.chip[data-tone="none"] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.verb {
+  font-weight: 750;
+  letter-spacing: -.015em;
+}
+
+.sep {
+  color: var(--muted);
+}
+
+.reason {
+  font-weight: 500;
+}
+
+.harness {
+  display: inline-block;
+  padding: 1px 8px;
+  border: 1px solid var(--fire);
+  border-radius: 999px;
+  color: var(--fire);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.diagramRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.diagram {
+  flex: none;
+  width: clamp(116px, 36cqi, 156px);
+  height: auto;
+  aspect-ratio: 1;
+  overflow: visible;
+}
+
+.ring {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.ringHalf {
+  stroke-dasharray: 2 3;
+}
+
+.glyph {
+  fill: var(--panel);
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.requested line,
+.requested path {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+  stroke-linecap: round;
+}
+
+.requested polygon {
+  fill: var(--panel);
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.executed line,
+.executed path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.executed polygon {
+  fill: var(--accent);
+  stroke: var(--accent);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+.key {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.key li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.key svg {
+  flex: none;
+  width: 22px;
+  height: 10px;
+  overflow: visible;
+}
+
+.provenance {
+  margin: 10px 0 0;
+  max-width: 70ch;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* Feature bars and numbers stay one click away. */
+.details {
+  border-top: 1px solid var(--line);
+}
+
+.details > summary {
+  cursor: pointer;
+  padding: 8px 0 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.details > summary:hover {
+  color: var(--ink);
+}
+
+.details[open] > summary {
+  margin-bottom: 6px;
+}
+
+/* Projector stage: larger callouts and diagram. */
+:global(.workspace[data-presenter="true"]) .chip {
+  font-size: 19px;
+}
+
+:global(.workspace[data-presenter="true"]) .harness {
+  font-size: 13px;
+}
+
+:global(.workspace[data-presenter="true"]) .diagram {
+  width: clamp(130px, 42cqi, 180px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .band::before {
+    transition: opacity 160ms linear;
+  }
+
+  .meterFill {
+    transition: height 160ms linear;
+  }
+}

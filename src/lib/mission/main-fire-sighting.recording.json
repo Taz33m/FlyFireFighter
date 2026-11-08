@@ -1,0 +1,1065 @@
+{
+ "label": "recording",
+ "note": "Excerpt of a simulated run (not a fixture, not real-world data): the belief snapshot the planner and harness read at the main mission's first sighting of the hall fire, recorded from the clean ded7b9e export (seed troy-seed-1, flow_baseline controller, local planner, scripted commander) at tick 21524. Kept: every belief field except the floor-plan prior (rebuilt from the scene metadata, identical), observations (only frames with person or fire detections in the last 30 s; here the fire frame) and hazards (fire sightings only).",
+ "envelope": {
+  "runId": "run-repro-main",
+  "revision": 1,
+  "approvedBy": "scripted-commander",
+  "approvedTick": 0,
+  "regions": [
+   {
+    "kind": "box",
+    "min": {
+     "x": -48,
+     "y": -34,
+     "z": -0.15
+    },
+    "max": {
+     "x": 62,
+     "y": 58,
+     "z": 8
+    }
+   }
+  ],
+  "maxSpeedMps": 2,
+  "ambientCeilingC": 80,
+  "endTick": 72000
+ },
+ "lastInterventionTick": 20343,
+ "belief": {
+  "runId": "run-repro-main",
+  "tick": 21524,
+  "evidenceRevision": 50315,
+  "mapRevision": 2,
+  "mapChanges": [
+   {
+    "revision": 2,
+    "tick": 20346,
+    "region": {
+     "kind": "box",
+     "min": {
+      "x": 17.65,
+      "y": -3.254,
+      "z": 4.3999999999999995
+     },
+     "max": {
+      "x": 18.75,
+      "y": -2.6540000000000004,
+      "z": 5.8
+     }
+    },
+    "reason": "Opening win-u-study-s1 observed broken; the plan or earlier evidence said closed.",
+    "observationIds": [
+     "run-repro-main/rgb-front/20344"
+    ]
+   }
+  ],
+  "pose": {
+   "tick": 21524,
+   "position": {
+    "x": 18.391329626038207,
+    "y": -0.5588408412212544,
+    "z": 4.691612098412113
+   },
+   "yawRad": 1.4372911312684202,
+   "velocity": {
+    "x": 0.039322106649383605,
+    "y": 0.26382291109108347,
+    "z": -0.031186195843264496
+   },
+   "sigmaM": 0.053156764124107594,
+   "yawSigmaRad": 0.01265783820620538,
+   "supported": true
+  },
+  "aircraft": {
+   "enduranceRemainingS": 684,
+   "waterRemainingL": 1,
+   "payloadsOnboard": [
+    "smoke-hood-1"
+   ],
+   "ambientC": 20.4,
+   "thrustAvailableN": 60
+  },
+  "landing": {
+   "supported": true,
+   "site": {
+    "x": 18.391329626038207,
+    "y": -0.5588408412212544,
+    "z": 3.598895220421844
+   },
+   "evidenceIds": [
+    "run-repro-main/ultrasound-down/21520"
+   ],
+   "reason": "ultrasound-down sees a flat surface 1.03 m below."
+  },
+  "reports": [
+   {
+    "id": "run-repro-main/report/1",
+    "runId": "run-repro-main",
+    "receivedTick": 0,
+    "source": "judge",
+    "channel": "typed",
+    "originalText": "Someone may be in the upstairs rear bedroom.",
+    "roomHint": "room-u-rear-bedroom",
+    "countText": "Someone",
+    "interpretation": "rules",
+    "supersedes": null
+   }
+  ],
+  "tracks": [
+   {
+    "id": "run-repro-main/t1",
+    "status": "possible",
+    "observationIds": [
+     "run-repro-main/rgb-front/2780",
+     "run-repro-main/rgb-front/2790",
+     "run-repro-main/rgb-front/2800",
+     "run-repro-main/rgb-front/2810",
+     "run-repro-main/rgb-front/2820",
+     "run-repro-main/rgb-front/2830",
+     "run-repro-main/rgb-front/2840",
+     "run-repro-main/rgb-front/2850",
+     "run-repro-main/rgb-front/2860",
+     "run-repro-main/rgb-front/2870",
+     "run-repro-main/rgb-front/2880",
+     "run-repro-main/rgb-front/2890",
+     "run-repro-main/rgb-front/2900",
+     "run-repro-main/rgb-front/2910",
+     "run-repro-main/rgb-front/2920",
+     "run-repro-main/rgb-front/2930",
+     "run-repro-main/rgb-front/2940",
+     "run-repro-main/rgb-front/2950",
+     "run-repro-main/rgb-front/2960",
+     "run-repro-main/rgb-front/2970",
+     "run-repro-main/rgb-front/2980",
+     "run-repro-main/rgb-front/2990",
+     "run-repro-main/rgb-front/3000",
+     "run-repro-main/rgb-front/3010",
+     "run-repro-main/rgb-front/3020",
+     "run-repro-main/rgb-front/3030",
+     "run-repro-main/rgb-front/3040",
+     "run-repro-main/rgb-front/3050",
+     "run-repro-main/rgb-front/3060",
+     "run-repro-main/rgb-front/3070",
+     "run-repro-main/rgb-front/3080",
+     "run-repro-main/rgb-front/3090",
+     "run-repro-main/rgb-front/3100",
+     "run-repro-main/rgb-front/3110",
+     "run-repro-main/rgb-front/3120",
+     "run-repro-main/rgb-front/3130",
+     "run-repro-main/rgb-front/3140",
+     "run-repro-main/rgb-front/3150",
+     "run-repro-main/rgb-front/3160",
+     "run-repro-main/rgb-front/3170",
+     "run-repro-main/rgb-front/3180",
+     "run-repro-main/rgb-front/3190",
+     "run-repro-main/rgb-front/3200",
+     "run-repro-main/rgb-front/3210",
+     "run-repro-main/rgb-front/3220",
+     "run-repro-main/rgb-front/3230",
+     "run-repro-main/rgb-front/3240",
+     "run-repro-main/rgb-front/3250",
+     "run-repro-main/rgb-front/3260",
+     "run-repro-main/rgb-front/3270",
+     "run-repro-main/rgb-front/3280",
+     "run-repro-main/rgb-front/3290",
+     "run-repro-main/rgb-front/3300",
+     "run-repro-main/rgb-front/3310",
+     "run-repro-main/rgb-front/3320",
+     "run-repro-main/rgb-front/3330",
+     "run-repro-main/rgb-front/3340",
+     "run-repro-main/rgb-front/3350",
+     "run-repro-main/rgb-front/3360",
+     "run-repro-main/rgb-front/3370",
+     "run-repro-main/rgb-front/3380",
+     "run-repro-main/rgb-front/3390",
+     "run-repro-main/rgb-front/3400",
+     "run-repro-main/rgb-front/3410",
+     "run-repro-main/rgb-front/3420",
+     "run-repro-main/rgb-front/3430",
+     "run-repro-main/rgb-front/3440",
+     "run-repro-main/rgb-front/10840",
+     "run-repro-main/rgb-front/10850",
+     "run-repro-main/rgb-front/10860",
+     "run-repro-main/rgb-front/10870",
+     "run-repro-main/rgb-front/10880",
+     "run-repro-main/rgb-front/10890",
+     "run-repro-main/rgb-front/10900",
+     "run-repro-main/rgb-front/10910",
+     "run-repro-main/rgb-front/10920",
+     "run-repro-main/rgb-front/10930",
+     "run-repro-main/rgb-front/10940",
+     "run-repro-main/rgb-front/10950",
+     "run-repro-main/rgb-front/10960",
+     "run-repro-main/rgb-front/10970",
+     "run-repro-main/rgb-front/10980",
+     "run-repro-main/rgb-front/10990",
+     "run-repro-main/rgb-front/11000",
+     "run-repro-main/rgb-front/11010",
+     "run-repro-main/rgb-front/11020",
+     "run-repro-main/rgb-front/11030",
+     "run-repro-main/rgb-front/11040",
+     "run-repro-main/rgb-front/11050",
+     "run-repro-main/rgb-front/11060",
+     "run-repro-main/rgb-front/11070",
+     "run-repro-main/rgb-front/11080",
+     "run-repro-main/rgb-front/11090",
+     "run-repro-main/rgb-front/11100",
+     "run-repro-main/rgb-front/11110",
+     "run-repro-main/rgb-front/11120",
+     "run-repro-main/rgb-front/11130",
+     "run-repro-main/rgb-front/11140",
+     "run-repro-main/rgb-front/11150",
+     "run-repro-main/rgb-front/11160",
+     "run-repro-main/rgb-front/11170",
+     "run-repro-main/rgb-front/11180",
+     "run-repro-main/rgb-front/11190",
+     "run-repro-main/rgb-front/11200",
+     "run-repro-main/rgb-front/11210",
+     "run-repro-main/rgb-front/11220",
+     "run-repro-main/rgb-front/11230",
+     "run-repro-main/rgb-front/11240",
+     "run-repro-main/rgb-front/11250",
+     "run-repro-main/rgb-front/11260"
+    ],
+    "position": {
+     "x": 23.994705249318425,
+     "y": 0.05582421661207396,
+     "z": 4.077620296766232
+    },
+    "uncertaintyM": 0.3963446062065285,
+    "roomId": "room-u-rear-bedroom",
+    "firstSeenTick": 2780,
+    "lastSeenTick": 11260,
+    "confidence": 0.681391624464555,
+    "mergedInto": null,
+    "ambiguousWith": []
+   }
+  ],
+  "crewConfirmations": [],
+  "coverage": [
+   {
+    "roomId": "room-g-entry",
+    "state": "unobserved",
+    "fractionAdequate": 0,
+    "fractionAny": 0,
+    "lastObservedTick": null,
+    "bestModality": null,
+    "fractionSearched": 0,
+    "searchedSince": []
+   },
+   {
+    "roomId": "room-g-living",
+    "state": "observed",
+    "fractionAdequate": 0.5661700262927257,
+    "fractionAny": 0.5670464504820333,
+    "lastObservedTick": 20450,
+    "bestModality": "rgb",
+    "fractionSearched": 0.5416301489921121,
+    "searchedSince": [
+     {
+      "sinceTick": 19170,
+      "fraction": 0.0017528483786152498
+     },
+     {
+      "sinceTick": 18750,
+      "fraction": 0.022787028921998246
+     },
+     {
+      "sinceTick": 18620,
+      "fraction": 0.04294478527607362
+     },
+     {
+      "sinceTick": 18560,
+      "fraction": 0.06573181419807186
+     },
+     {
+      "sinceTick": 18490,
+      "fraction": 0.09377738825591586
+     },
+     {
+      "sinceTick": 18470,
+      "fraction": 0.11831726555652936
+     },
+     {
+      "sinceTick": 18440,
+      "fraction": 0.1516213847502191
+     },
+     {
+      "sinceTick": 18420,
+      "fraction": 0.17177914110429449
+     },
+     {
+      "sinceTick": 17670,
+      "fraction": 0.19982471516213848
+     },
+     {
+      "sinceTick": 17660,
+      "fraction": 0.2287467134092901
+     },
+     {
+      "sinceTick": 17650,
+      "fraction": 0.2532865907099036
+     },
+     {
+      "sinceTick": 17630,
+      "fraction": 0.2883435582822086
+     },
+     {
+      "sinceTick": 17610,
+      "fraction": 0.3172655565293602
+     },
+     {
+      "sinceTick": 17600,
+      "fraction": 0.3418054338299737
+     },
+     {
+      "sinceTick": 17580,
+      "fraction": 0.3733567046450482
+     },
+     {
+      "sinceTick": 17560,
+      "fraction": 0.3970201577563541
+     },
+     {
+      "sinceTick": 17330,
+      "fraction": 0.4171779141104294
+     },
+     {
+      "sinceTick": 17140,
+      "fraction": 0.43821209465381245
+     },
+     {
+      "sinceTick": 9860,
+      "fraction": 0.4697633654688869
+     },
+     {
+      "sinceTick": 9850,
+      "fraction": 0.5100788781770377
+     },
+     {
+      "sinceTick": 9690,
+      "fraction": 0.530236634531113
+     },
+     {
+      "sinceTick": 8390,
+      "fraction": 0.5416301489921121
+     }
+    ]
+   },
+   {
+    "roomId": "room-g-kitchen",
+    "state": "observed",
+    "fractionAdequate": 0.6652126499454744,
+    "fractionAny": 0.6706652126499455,
+    "lastObservedTick": 18610,
+    "bestModality": "rgb",
+    "fractionSearched": 0.6483097055616139,
+    "searchedSince": [
+     {
+      "sinceTick": 18610,
+      "fraction": 0.0005452562704471102
+     },
+     {
+      "sinceTick": 10920,
+      "fraction": 0.021264994547437296
+     },
+     {
+      "sinceTick": 9980,
+      "fraction": 0.04634678298800436
+     },
+     {
+      "sinceTick": 9960,
+      "fraction": 0.06706652126499454
+     },
+     {
+      "sinceTick": 9940,
+      "fraction": 0.0965103598691385
+     },
+     {
+      "sinceTick": 9930,
+      "fraction": 0.1183206106870229
+     },
+     {
+      "sinceTick": 9910,
+      "fraction": 0.15757906215921483
+     },
+     {
+      "sinceTick": 9900,
+      "fraction": 0.17884405670665213
+     },
+     {
+      "sinceTick": 9890,
+      "fraction": 0.20010905125408943
+     },
+     {
+      "sinceTick": 9880,
+      "fraction": 0.22300981461286803
+     },
+     {
+      "sinceTick": 9870,
+      "fraction": 0.24482006543075246
+     },
+     {
+      "sinceTick": 9860,
+      "fraction": 0.27262813522355506
+     },
+     {
+      "sinceTick": 9850,
+      "fraction": 0.29770992366412213
+     },
+     {
+      "sinceTick": 9830,
+      "fraction": 0.32006543075245364
+     },
+     {
+      "sinceTick": 9750,
+      "fraction": 0.3429661941112323
+     },
+     {
+      "sinceTick": 9720,
+      "fraction": 0.3822246455834242
+     },
+     {
+      "sinceTick": 9690,
+      "fraction": 0.4143947655398037
+     },
+     {
+      "sinceTick": 9660,
+      "fraction": 0.4531079607415485
+     },
+     {
+      "sinceTick": 9350,
+      "fraction": 0.4732824427480916
+     },
+     {
+      "sinceTick": 8400,
+      "fraction": 0.4940021810250818
+     },
+     {
+      "sinceTick": 8380,
+      "fraction": 0.5196292257360959
+     },
+     {
+      "sinceTick": 8350,
+      "fraction": 0.5430752453653217
+     },
+     {
+      "sinceTick": 8320,
+      "fraction": 0.5648854961832062
+     },
+     {
+      "sinceTick": 8300,
+      "fraction": 0.5916030534351145
+     },
+     {
+      "sinceTick": 1770,
+      "fraction": 0.6117775354416576
+     },
+     {
+      "sinceTick": 1640,
+      "fraction": 0.6319520174482006
+     },
+     {
+      "sinceTick": 1120,
+      "fraction": 0.6483097055616139
+     }
+    ]
+   },
+   {
+    "roomId": "room-u-hall",
+    "state": "observed",
+    "fractionAdequate": 0.23062015503875968,
+    "fractionAny": 0.23255813953488372,
+    "lastObservedTick": 21520,
+    "bestModality": "rgb",
+    "fractionSearched": 0.2248062015503876,
+    "searchedSince": [
+     {
+      "sinceTick": 21520,
+      "fraction": 0.025193798449612403
+     },
+     {
+      "sinceTick": 21500,
+      "fraction": 0.04844961240310078
+     },
+     {
+      "sinceTick": 21450,
+      "fraction": 0.06976744186046512
+     },
+     {
+      "sinceTick": 21310,
+      "fraction": 0.09302325581395349
+     },
+     {
+      "sinceTick": 20910,
+      "fraction": 0.11434108527131782
+     },
+     {
+      "sinceTick": 11050,
+      "fraction": 0.14147286821705427
+     },
+     {
+      "sinceTick": 3520,
+      "fraction": 0.17248062015503876
+     },
+     {
+      "sinceTick": 3510,
+      "fraction": 0.1937984496124031
+     },
+     {
+      "sinceTick": 3440,
+      "fraction": 0.2189922480620155
+     },
+     {
+      "sinceTick": 3330,
+      "fraction": 0.2248062015503876
+     }
+    ]
+   },
+   {
+    "roomId": "room-u-rear-bedroom",
+    "state": "observed",
+    "fractionAdequate": 0.5452674897119342,
+    "fractionAny": 0.5452674897119342,
+    "lastObservedTick": 16690,
+    "bestModality": "rgb",
+    "fractionSearched": 0.51440329218107,
+    "searchedSince": [
+     {
+      "sinceTick": 15120,
+      "fraction": 0.00205761316872428
+     },
+     {
+      "sinceTick": 11260,
+      "fraction": 0.03909465020576132
+     },
+     {
+      "sinceTick": 11250,
+      "fraction": 0.06584362139917696
+     },
+     {
+      "sinceTick": 11200,
+      "fraction": 0.08641975308641975
+     },
+     {
+      "sinceTick": 11180,
+      "fraction": 0.11522633744855967
+     },
+     {
+      "sinceTick": 11150,
+      "fraction": 0.1440329218106996
+     },
+     {
+      "sinceTick": 11130,
+      "fraction": 0.17078189300411523
+     },
+     {
+      "sinceTick": 11110,
+      "fraction": 0.19135802469135801
+     },
+     {
+      "sinceTick": 11100,
+      "fraction": 0.2242798353909465
+     },
+     {
+      "sinceTick": 11070,
+      "fraction": 0.294238683127572
+     },
+     {
+      "sinceTick": 11020,
+      "fraction": 0.32098765432098764
+     },
+     {
+      "sinceTick": 11010,
+      "fraction": 0.345679012345679
+     },
+     {
+      "sinceTick": 10980,
+      "fraction": 0.3683127572016461
+     },
+     {
+      "sinceTick": 3400,
+      "fraction": 0.3888888888888889
+     },
+     {
+      "sinceTick": 3390,
+      "fraction": 0.4156378600823045
+     },
+     {
+      "sinceTick": 3380,
+      "fraction": 0.44238683127572015
+     },
+     {
+      "sinceTick": 3370,
+      "fraction": 0.46502057613168724
+     },
+     {
+      "sinceTick": 2980,
+      "fraction": 0.48559670781893005
+     },
+     {
+      "sinceTick": 2420,
+      "fraction": 0.5061728395061729
+     },
+     {
+      "sinceTick": 2340,
+      "fraction": 0.51440329218107
+     }
+    ]
+   },
+   {
+    "roomId": "room-u-front-bedroom",
+    "state": "observed",
+    "fractionAdequate": 0.10138888888888889,
+    "fractionAny": 0.10972222222222222,
+    "lastObservedTick": 3650,
+    "bestModality": "rgb",
+    "fractionSearched": 0.09861111111111111,
+    "searchedSince": [
+     {
+      "sinceTick": 2190,
+      "fraction": 0.004166666666666667
+     },
+     {
+      "sinceTick": 2160,
+      "fraction": 0.025
+     },
+     {
+      "sinceTick": 1780,
+      "fraction": 0.04722222222222222
+     },
+     {
+      "sinceTick": 1690,
+      "fraction": 0.07083333333333333
+     },
+     {
+      "sinceTick": 1130,
+      "fraction": 0.09305555555555556
+     },
+     {
+      "sinceTick": 1100,
+      "fraction": 0.09861111111111111
+     }
+    ]
+   },
+   {
+    "roomId": "room-u-bath",
+    "state": "observed",
+    "fractionAdequate": 0.07333333333333333,
+    "fractionAny": 0.07333333333333333,
+    "lastObservedTick": 16770,
+    "bestModality": "lidar",
+    "fractionSearched": 0,
+    "searchedSince": []
+   },
+   {
+    "roomId": "room-u-study",
+    "state": "observed",
+    "fractionAdequate": 0.7529239766081871,
+    "fractionAny": 0.7573099415204678,
+    "lastObservedTick": 21520,
+    "bestModality": "ultrasound",
+    "fractionSearched": 0.706140350877193,
+    "searchedSince": [
+     {
+      "sinceTick": 21520,
+      "fraction": 0.1783625730994152
+     },
+     {
+      "sinceTick": 21470,
+      "fraction": 0.20029239766081872
+     },
+     {
+      "sinceTick": 21400,
+      "fraction": 0.22807017543859648
+     },
+     {
+      "sinceTick": 21360,
+      "fraction": 0.25
+     },
+     {
+      "sinceTick": 21290,
+      "fraction": 0.2719298245614035
+     },
+     {
+      "sinceTick": 21230,
+      "fraction": 0.29239766081871343
+     },
+     {
+      "sinceTick": 21180,
+      "fraction": 0.3128654970760234
+     },
+     {
+      "sinceTick": 21130,
+      "fraction": 0.3362573099415205
+     },
+     {
+      "sinceTick": 21070,
+      "fraction": 0.3567251461988304
+     },
+     {
+      "sinceTick": 21020,
+      "fraction": 0.37719298245614036
+     },
+     {
+      "sinceTick": 20940,
+      "fraction": 0.402046783625731
+     },
+     {
+      "sinceTick": 20900,
+      "fraction": 0.4239766081871345
+     },
+     {
+      "sinceTick": 20860,
+      "fraction": 0.44883040935672514
+     },
+     {
+      "sinceTick": 20840,
+      "fraction": 0.47076023391812866
+     },
+     {
+      "sinceTick": 20730,
+      "fraction": 0.49415204678362573
+     },
+     {
+      "sinceTick": 20660,
+      "fraction": 0.5146198830409356
+     },
+     {
+      "sinceTick": 20620,
+      "fraction": 0.5409356725146199
+     },
+     {
+      "sinceTick": 20580,
+      "fraction": 0.5672514619883041
+     },
+     {
+      "sinceTick": 20520,
+      "fraction": 0.5891812865497076
+     },
+     {
+      "sinceTick": 20450,
+      "fraction": 0.6111111111111112
+     },
+     {
+      "sinceTick": 20080,
+      "fraction": 0.631578947368421
+     },
+     {
+      "sinceTick": 19060,
+      "fraction": 0.6535087719298246
+     },
+     {
+      "sinceTick": 16720,
+      "fraction": 0.6739766081871345
+     },
+     {
+      "sinceTick": 3480,
+      "fraction": 0.6944444444444444
+     },
+     {
+      "sinceTick": 2820,
+      "fraction": 0.706140350877193
+     }
+    ]
+   }
+  ],
+  "openings": [
+   {
+    "openingId": "door-g-living-kitchen",
+    "state": "open",
+    "tick": 18488,
+    "observationId": "run-repro-main/rgb-front/18488"
+   },
+   {
+    "openingId": "door-u-rear-bedroom",
+    "state": "open",
+    "tick": 11144,
+    "observationId": "run-repro-main/rgb-front/11144"
+   },
+   {
+    "openingId": "door-u-study",
+    "state": "open",
+    "tick": 21522,
+    "observationId": "run-repro-main/rgb-front/21522"
+   },
+   {
+    "openingId": "win-g-kitchen-e",
+    "state": "closed",
+    "tick": 15580,
+    "observationId": "run-repro-main/rgb-down/15580"
+   },
+   {
+    "openingId": "win-g-kitchen-n",
+    "state": "closed",
+    "tick": 1788,
+    "observationId": "run-repro-main/rgb-front/1788"
+   },
+   {
+    "openingId": "win-g-kitchen-s",
+    "state": "closed",
+    "tick": 18738,
+    "observationId": "run-repro-main/rgb-front/18738"
+   },
+   {
+    "openingId": "win-g-living-s1",
+    "state": "closed",
+    "tick": 17044,
+    "observationId": "run-repro-main/rgb-front/17044"
+   },
+   {
+    "openingId": "win-g-living-s2",
+    "state": "closed",
+    "tick": 18572,
+    "observationId": "run-repro-main/rgb-front/18572"
+   },
+   {
+    "openingId": "win-g-living-s3",
+    "state": "closed",
+    "tick": 19150,
+    "observationId": "run-repro-main/rgb-down/19150"
+   },
+   {
+    "openingId": "win-u-bath-s",
+    "state": "closed",
+    "tick": 18852,
+    "observationId": "run-repro-main/rgb-front/18852"
+   },
+   {
+    "openingId": "win-u-front-bedroom-e",
+    "state": "closed",
+    "tick": 2192,
+    "observationId": "run-repro-main/rgb-front/2192"
+   },
+   {
+    "openingId": "win-u-front-bedroom-n",
+    "state": "closed",
+    "tick": 1806,
+    "observationId": "run-repro-main/rgb-front/1806"
+   },
+   {
+    "openingId": "win-u-rear-bedroom",
+    "state": "closed",
+    "tick": 18750,
+    "observationId": "run-repro-main/rgb-front/18750"
+   },
+   {
+    "openingId": "win-u-rear-bedroom-east",
+    "state": "closed",
+    "tick": 14210,
+    "observationId": "run-repro-main/rgb-down/14210"
+   },
+   {
+    "openingId": "win-u-study-s1",
+    "state": "broken",
+    "tick": 20514,
+    "observationId": "run-repro-main/rgb-front/20514"
+   }
+  ],
+  "routes": [
+   {
+    "id": "route-return",
+    "purpose": "return",
+    "waypoints": [
+     {
+      "x": 18.36473234283774,
+      "y": -0.6243661148946243,
+      "z": 4.700249716253876
+     },
+     {
+      "x": 18.2,
+      "y": -2.354,
+      "z": 5.1
+     },
+     {
+      "x": 18.2,
+      "y": -2.954,
+      "z": 5.1
+     },
+     {
+      "x": 18.2,
+      "y": -3.5540000000000003,
+      "z": 5.1
+     },
+     {
+      "x": 27.253,
+      "y": -3.779,
+      "z": 3.995641282942895
+     },
+     {
+      "x": 30.5,
+      "y": 28,
+      "z": 0.1
+     }
+    ],
+    "status": "supported",
+    "assessedTick": 21500,
+    "evidenceIds": [
+     "run-repro-main/rgb-front/20514"
+    ],
+    "estimatedDurationS": 44.28685066449502,
+    "reason": "Supported: 44.3 m for the drone, about 44.3 s; rooms on the route (room-u-study) need no person search for the drone's own passage; the harness guards its clearance; openings observed: win-u-study-s1 broken."
+   },
+   {
+    "id": "route-evacuation",
+    "purpose": "evacuation",
+    "waypoints": [
+     {
+      "x": 23.994705249318425,
+      "y": 0.05582421661207396,
+      "z": 4.077620296766232
+     },
+     {
+      "x": 22.675,
+      "y": 0.55,
+      "z": 4.65
+     },
+     {
+      "x": 22.075,
+      "y": 0.55,
+      "z": 4.65
+     },
+     {
+      "x": 21.474999999999998,
+      "y": 0.55,
+      "z": 4.65
+     },
+     {
+      "x": 20.152,
+      "y": 3.607,
+      "z": 4.6
+     },
+     {
+      "x": 19.552,
+      "y": 3.757,
+      "z": 4.6
+     },
+     {
+      "x": 14.232,
+      "y": 3.757,
+      "z": 1
+     },
+     {
+      "x": 13.082,
+      "y": 3.907,
+      "z": 1
+     },
+     {
+      "x": 13.107000000000001,
+      "y": 6.209,
+      "z": 1.1
+     },
+     {
+      "x": 13.707,
+      "y": 6.209,
+      "z": 1.1
+     },
+     {
+      "x": 14.307,
+      "y": 6.209,
+      "z": 1.1
+     },
+     {
+      "x": 19,
+      "y": 25.5,
+      "z": 1.25
+     }
+    ],
+    "status": "unknown",
+    "assessedTick": 21500,
+    "evidenceIds": [
+     "run-repro-main/lidar-planar/21495",
+     "run-repro-main/ultrasound-front/21495"
+    ],
+    "estimatedDurationS": 47.01585064962744,
+    "reason": "Not yet supported for the occupant: rooms without fresh coverage: room-u-rear-bedroom (last observed at tick 16690, before the intervention at tick 20343), room-u-hall (only 11% person-searched at adequate quality since the intervention at tick 20343; needs 30%), room-g-entry (never observed); openings without a fresh observation: door-u-rear-bedroom (last observed open at tick 11144, before the intervention at tick 20343), door-front (plan says closed; not observed)."
+   }
+  ],
+  "dispatchConfirmed": null,
+  "observations": [
+   {
+    "id": "run-repro-main/rgb-front/21522",
+    "runId": "run-repro-main",
+    "sensorId": "rgb-front",
+    "modality": "rgb",
+    "captureTick": 21522,
+    "arrivalTick": 21524,
+    "frameId": "run-repro-main/rgb-front/frame/21522",
+    "calibrationId": "rgb-front/v1",
+    "provenance": "simulated_sensor",
+    "sensorPose": {
+     "position": {
+      "x": 18.43874763971949,
+      "y": -0.4360505322607008,
+      "z": 4.72034521912451
+     },
+     "yawRad": 1.4372741004215346,
+     "sigmaM": 0.053168332956293314
+    },
+    "quality": 0.5645927764001416,
+    "footprint": null,
+    "personSearch": null,
+    "detections": [
+     {
+      "kind": "hazard",
+      "hazard": "fire",
+      "region": {
+       "kind": "sphere",
+       "center": {
+        "x": 20.87272428355616,
+        "y": 2.091741044474894,
+        "z": 3.6066727375086294
+       },
+       "radiusM": 0.3853205521606584
+      },
+      "intensity": 0.08719557103241214
+     },
+     {
+      "kind": "hazard",
+      "hazard": "smoke",
+      "region": {
+       "kind": "sector",
+       "apex": {
+        "x": 18.43874763971949,
+        "y": -0.4360505322607008,
+        "z": 4.72034521912451
+       },
+       "axis": {
+        "x": 0.13110335613432508,
+        "y": 0.9760421201993644,
+        "z": -0.17364817766693033
+       },
+       "halfAngleRad": 0.5122541354603357,
+       "rangeM": 3.0804516074877557
+      },
+      "intensity": 0.2612159047769729
+     },
+     {
+      "kind": "opening_state",
+      "openingId": "door-u-study",
+      "state": "open"
+     }
+    ],
+    "supersedes": null
+   }
+  ],
+  "hazards": [
+   {
+    "observationId": "run-repro-main/rgb-front/21522",
+    "tick": 21522,
+    "hazard": "fire",
+    "region": {
+     "kind": "sphere",
+     "center": {
+      "x": 20.87272428355616,
+      "y": 2.091741044474894,
+      "z": 3.6066727375086294
+     },
+     "radiusM": 0.3853205521606584
+    },
+    "intensity": 0.08719557103241214
+   }
+  ]
+ }
+}

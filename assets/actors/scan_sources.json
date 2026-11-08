@@ -1,0 +1,34 @@
+{
+  "schema": "flyfirefighter.actor-sources/1",
+  "note": "Pinned inputs for build_scan_occupant.py: the two Sketchfab download archives, unmodified, in the git-ignored cache (assets/cache/characters/mike-alger/). Downloaded manually by the user while signed in to Sketchfab; never mirrored or bulk-fetched. The animation clips and the Rocketbox reference skeleton come from occupant_sources.json.",
+  "model": {
+    "title": "Rigged T-Pose Human Male w 50 Face Blendshapes",
+    "uid": "cc7e4596bcd145208a6992c757854c07",
+    "url": "https://sketchfab.com/3d-models/rigged-t-pose-human-male-w-50-face-blendshapes-cc7e4596bcd145208a6992c757854c07",
+    "author": "Mike Alger",
+    "authorUrl": "https://sketchfab.com/mikealger",
+    "creatorStatement": "This is a rigged scan of me free to download and use in whatever weird thing you want to put it in. Scanned by Doob, optimized and rigged by High Fidelity.",
+    "licence": { "spdx": "CC-BY-4.0", "url": "http://creativecommons.org/licenses/by/4.0/" }
+  },
+  "files": [
+    {
+      "role": "scan.source",
+      "path": "rigged-t-pose-human-male-w-50-face-blendshapes.zip",
+      "download": "Sketchfab 'Original format (fbx)'",
+      "sha256": "bddfb82d2a316088cd3c2626f25fb8e3f60869382d1c63e31e1cef156901fa04",
+      "members": {
+        "source/MikeAlger.fbx": "639263d67cc7327451ea439e8da5b582bd9a57d26dcebda86162ac831a01e969",
+        "textures/MikeAlger_Texture.jpeg": "9a2dcf5de90a35259a3f2551429d84f431efede9185bf5a2bb41283a2ad01217"
+      }
+    },
+    {
+      "role": "scan.licence",
+      "path": "rigged_t-pose_human_male_w_50_face_blendshapes.zip",
+      "download": "Sketchfab auto-converted 'glTF' (used only for license.txt; its geometry has no morph targets)",
+      "sha256": "64f0b5eb0b6107ddf3c01f533487da6d36608ee4bcea99d8831c175fb4b45538",
+      "members": {
+        "license.txt": "66e0e728600dadc682cb27a31a31dd13146ecf5180f14450fea69e44b4b389a2"
+      }
+    }
+  ]
+}

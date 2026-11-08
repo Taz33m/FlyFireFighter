@@ -1,0 +1,84 @@
+/**
+ * Web Serial adapter for the console session. Browser only (Chrome and Edge ship Web Serial; it needs a
+ * secure context such as http://127.0.0.1 and a user gesture to choose the port).
+ *
+ * The chooser lists only the Free-WiLi OG MAIN CPU (Intrepid VID 0x093C, PID 0x2054). Under the official OG
+ * firmware (v023+) MAIN is where host commands go; it reaches the buttons and screen over its link to the display
+ * CPU. MAIN shows two serial ports, "Board CDC" (commands) and "FWOG binary events"; Web Serial cannot filter by
+ * interface, so the session identifies the port with `?` before writing anything else (session.ts). MAIN also
+ * carries the radios, IR and GPIO; the session's write allowlist cannot express any of their commands.
+ * TypeScript's DOM library has no Web Serial types, so the small subset used here is declared locally.
+ */
+import type { ConsoleTransport } from "./session.ts";
+
+export const FREEWILI_USB_VENDOR_ID = 0x093c;
+export const FREEWILI_DISPLAY_PRODUCT_ID = 0x2055;
+export const FREEWILI_MAIN_PRODUCT_ID = 0x2054;
+
+export interface SerialPortInfoLike {
+  readonly usbVendorId?: number;
+  readonly usbProductId?: number;
+}
+
+export interface SerialPortLike {
+  open(options: { readonly baudRate: number }): Promise<void>;
+  close(): Promise<void>;
+  getInfo(): SerialPortInfoLike;
+  readonly readable: ReadableStream<Uint8Array> | null;
+  readonly writable: WritableStream<Uint8Array> | null;
+}
+
+export interface SerialLike {
+  requestPort(options?: { readonly filters: readonly SerialPortInfoLike[] }): Promise<SerialPortLike>;
+}
+
+export function webSerial(): SerialLike | null {
+  if (typeof navigator === "undefined") return null;
+  const serial = (navigator as Navigator & { readonly serial?: SerialLike }).serial;
+  return serial ?? null;
+}
+
+/** Ask the user to choose a MAIN CPU port. Throws if they cancel or pick something else. */
+export async function requestConsolePort(serial: SerialLike): Promise<SerialPortLike> {
+  const port = await serial.requestPort({ filters: [{ usbVendorId: FREEWILI_USB_VENDOR_ID, usbProductId: FREEWILI_MAIN_PRODUCT_ID }] });
+  const info = port.getInfo();
+  if (info.usbVendorId !== FREEWILI_USB_VENDOR_ID || info.usbProductId !== FREEWILI_MAIN_PRODUCT_ID) {
+    throw new Error("That port is not the Free-WiLi MAIN CPU.");
+  }
+  return port;
+}
+
+export function webSerialTransport(port: SerialPortLike): ConsoleTransport {
+  let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+  return {
+    open: options => port.open(options),
+    async *chunks() {
+      while (port.readable !== null) {
+        reader = port.readable.getReader();
+        try {
+          for (;;) {
+            const { value, done } = await reader.read();
+            if (done) return;
+            if (value !== undefined) yield value;
+          }
+        } finally {
+          reader.releaseLock();
+          reader = null;
+        }
+      }
+    },
+    async write(bytes) {
+      if (port.writable === null) throw new Error("The console port is not writable.");
+      const writer = port.writable.getWriter();
+      try {
+        await writer.write(bytes);
+      } finally {
+        writer.releaseLock();
+      }
+    },
+    async close() {
+      try { await reader?.cancel(); } catch { /* already released */ }
+      await port.close();
+    },
+  };
+}

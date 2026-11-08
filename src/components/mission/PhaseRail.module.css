@@ -1,0 +1,373 @@
+/*
+ * Phase rail. Colours are the globals.css tokens; every size is derived from the custom properties below, so
+ * data-size="stage" scales the whole rail for a projector. Motion is opt-in (prefers-reduced-motion).
+ */
+
+.rail {
+  --marker: 24px;
+  --line-w: 1px;
+  --label-size: 12px;
+  --gate-size: 11px;
+  --caption-size: 13px;
+  --step-gap: 6px;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  color: var(--ink);
+}
+
+.rail[data-size="stage"] {
+  --marker: 46px;
+  --line-w: 4px;
+  --label-size: 21px;
+  --gate-size: 16px;
+  --caption-size: 30px;
+  --step-gap: 10px;
+  gap: 20px;
+  padding: 18px 24px 0;
+}
+
+/* Short projector modes (1280x720, 1024x768): a smaller stage rail so the 3D view keeps the fold. */
+@media (max-height: 820px) {
+  .rail[data-size="stage"] {
+    --marker: 34px;
+    --line-w: 3px;
+    --label-size: 17px;
+    --gate-size: 13px;
+    --caption-size: 22px;
+    --step-gap: 6px;
+    gap: 10px;
+    padding: 12px 20px 0;
+  }
+}
+
+/* Halt banner, shown over the rail. */
+
+.halt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--alert);
+  border-left-width: calc(var(--line-w) * 2);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--alert) 14%, var(--panel));
+  font-size: calc(var(--label-size) * 1.1);
+}
+
+/* On the stage the caption carries the plain explanation; the harness detail is for the operator console. */
+.rail[data-size="stage"] .haltDetail {
+  display: none;
+}
+
+.halt[data-kind="paused"] {
+  border-color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 10%, var(--panel));
+}
+
+.haltIcon {
+  display: inline-grid;
+  width: 1.15em;
+  height: 1.15em;
+  color: var(--alert);
+}
+
+.haltIcon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.haltTitle {
+  font-weight: 750;
+  color: var(--alert);
+}
+
+.halt[data-kind="paused"] .haltIcon,
+.halt[data-kind="paused"] .haltTitle {
+  color: var(--ink);
+}
+
+.haltDetail {
+  flex-basis: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--gate-size);
+  line-height: 1.35;
+}
+
+/* Steps. */
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  row-gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--step-gap);
+  min-width: 0;
+  padding: 0 4px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* Connector from the previous step's marker into this one, through the marker centres. */
+.step::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--marker) / 2 - var(--line-w) / 2);
+  left: -50%;
+  right: 50%;
+  height: var(--line-w);
+  background: var(--line);
+}
+
+.step:first-child::before {
+  display: none;
+}
+
+.step[data-state="done"]::before,
+.step[data-state="current"]::before {
+  background: var(--accent);
+}
+
+.step[data-state="skipped"]::before {
+  background: repeating-linear-gradient(90deg, var(--muted) 0 6px, transparent 6px 11px);
+}
+
+.marker {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--marker);
+  height: var(--marker);
+  border: var(--line-w) solid var(--line);
+  border-radius: 50%;
+  background: var(--background);
+  color: var(--muted);
+  font-size: calc(var(--marker) * 0.46);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.marker > svg {
+  width: 62%;
+  height: 62%;
+}
+
+.number {
+  line-height: 1;
+}
+
+.step[data-state="done"] .marker {
+  border-color: var(--line);
+  background: var(--raised);
+  color: var(--ink);
+}
+
+.step[data-state="current"] .marker {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.step[data-state="skipped"] .marker {
+  border-style: dashed;
+  border-color: var(--muted);
+}
+
+/* A halted rail keeps its progress; the step it stopped on turns to the alert colour. */
+.rail[data-halt="aborted"] .step[data-state="current"] .marker,
+.rail[data-halt="contingency"] .step[data-state="current"] .marker,
+.rail[data-halt="ended_incomplete"] .step[data-state="current"] .marker {
+  border-color: var(--alert);
+  background: var(--background);
+  color: var(--alert);
+  box-shadow: 0 0 0 calc(var(--line-w) * 1.5) color-mix(in srgb, var(--alert) 22%, transparent);
+}
+
+.rail[data-halt="paused"] .step[data-state="current"] .marker {
+  border-color: var(--muted);
+  background: var(--background);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+/* Approval-gate badge on the marker. */
+.shield {
+  position: absolute;
+  top: -22%;
+  right: -26%;
+  display: grid;
+  place-items: center;
+  width: 58%;
+  height: 58%;
+  padding: 1px;
+  border-radius: 50%;
+  background: var(--background);
+  color: var(--muted);
+}
+
+.shield svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cut {
+  stroke: var(--background);
+}
+
+.label {
+  font-size: var(--label-size);
+  font-weight: 600;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.step[data-state="done"] .label {
+  color: var(--ink);
+}
+
+.step[data-state="current"] .label {
+  color: var(--ink);
+  font-weight: 750;
+}
+
+.note {
+  font-size: var(--gate-size);
+  font-style: italic;
+}
+
+/* Gate state chip. */
+.gate {
+  max-width: 100%;
+  padding: 1px 7px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: var(--gate-size);
+  font-weight: 650;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.step[data-gate="awaiting_approval"] .gate {
+  border-color: var(--fire);
+  background: var(--fire);
+  color: #2a1606;
+}
+
+.step[data-gate="approved"] .gate,
+.step[data-gate="executing"] .gate {
+  color: var(--water);
+  background: color-mix(in srgb, var(--water) 12%, transparent);
+}
+
+.step[data-gate="completed"] .gate {
+  color: var(--accent);
+}
+
+.step[data-gate="rejected"] .gate,
+.step[data-gate="invalidated"] .gate,
+.step[data-gate="expired"] .gate,
+.step[data-gate="aborted"] .gate {
+  color: var(--alert);
+  background: color-mix(in srgb, var(--alert) 12%, transparent);
+}
+
+.step[data-gate="awaiting_approval"] .shield {
+  color: var(--fire);
+}
+
+.step[data-gate="approved"] .shield,
+.step[data-gate="executing"] .shield {
+  color: var(--water);
+}
+
+.step[data-gate="completed"] .shield {
+  color: var(--accent);
+}
+
+.step[data-gate="rejected"] .shield,
+.step[data-gate="invalidated"] .shield,
+.step[data-gate="expired"] .shield,
+.step[data-gate="aborted"] .shield {
+  color: var(--alert);
+}
+
+/* Caption. */
+
+.caption {
+  margin: 0;
+  padding: 8px 0 10px;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-size: var(--caption-size);
+  font-weight: 600;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+
+.rail[data-size="stage"] .caption {
+  text-align: center;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Narrow containers: two rows of four. */
+
+@container (max-width: 560px) {
+  .steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .step:nth-child(4n + 1)::before {
+    display: none;
+  }
+}
+
+@container (max-width: 760px) {
+  .rail[data-size="stage"] .steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .rail[data-size="stage"] .step:nth-child(4n + 1)::before {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marker,
+  .step::before,
+  .gate {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+}

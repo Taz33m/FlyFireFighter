@@ -1,0 +1,58 @@
+{
+  "source": "https://github.com/TuragaLab/flyvis",
+  "commit": "0a69fa2fc8e1bfe1d837d722c252ab5f5d6fcbfa",
+  "license": "MIT",
+  "purpose": "Unmodified reference subset for FlyFireFighter integration; not an installed or independently importable runtime package.",
+  "files": [
+    {
+      "path": "license",
+      "gitBlobSha1": "760e32010d9043cb1cf0162a16dde5dbfa7fab96",
+      "modified": false
+    },
+    {
+      "path": "flyvis/datasets/rendering/eye.py",
+      "gitBlobSha1": "55c679a203dc6248e51d11932b146d4e6962910b",
+      "modified": false
+    },
+    {
+      "path": "flyvis/network/network.py",
+      "gitBlobSha1": "db55efad88b7f67a44a36fde2f99f9637d1934a0",
+      "modified": false
+    },
+    {
+      "path": "flyvis/network/network_view.py",
+      "gitBlobSha1": "01e7e1f22b658ef82a12751dd15d7b37dfd784c6",
+      "modified": false
+    },
+    {
+      "path": "flyvis/network/stimulus.py",
+      "gitBlobSha1": "3ffc1efb871a690284fa029123f2dc5295a60a18",
+      "modified": false
+    },
+    {
+      "path": "flyvis/task/decoder.py",
+      "gitBlobSha1": "cb69d6954acae902c4b8a7fb5a9403883c857de6",
+      "modified": false
+    },
+    {
+      "path": "flyvis/task/objectives.py",
+      "gitBlobSha1": "8e14897d70a3002c981abee876ee9c46f134d6f4",
+      "modified": false
+    },
+    {
+      "path": "tests/test_rendering.py",
+      "gitBlobSha1": "2c4e4e68f99f5a49dfca9e7722f2242c84ab93a1",
+      "modified": false
+    },
+    {
+      "path": "tests/test_network.py",
+      "gitBlobSha1": "0c51c05f39c59eb7449aa919733c41af57fdb3b6",
+      "modified": false
+    },
+    {
+      "path": "pyproject.toml",
+      "gitBlobSha1": "6afb6d4254f24646fdc8e0cb974aaa72804f247c",
+      "modified": false
+    }
+  ]
+}

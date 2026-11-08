@@ -1,0 +1,275 @@
+{
+  "schema": "flyfirefighter.flow-baseline-tuning/1",
+  "created": "2026-11-08T03:18:00.793Z",
+  "selectedName": "eig1e-5-vis0.03-brake",
+  "selected": {
+    "flow": {
+      "minEigen": 0.00001
+    },
+    "command": {
+      "minVisualConfidence": 0.03,
+      "fullVisualConfidence": 0.2,
+      "brakeTimeS": 0.8,
+      "stopDistanceM": 0.6
+    }
+  },
+  "selection": "highest validation tuningScore over 12 validation courses × {no range, range} after a 12-train-course screen; test courses never used",
+  "trainCourses": [
+    "train-ecabf060",
+    "train-f525c15e",
+    "train-ce6ae191",
+    "train-7358f260",
+    "train-5062b1ab",
+    "train-a2c09698",
+    "train-5eb43172",
+    "train-62304662",
+    "train-6053c4e3",
+    "train-9ea3b7d0",
+    "train-5ff25fe3",
+    "train-8364d188"
+  ],
+  "validationCourses": [
+    "val-64f08b96",
+    "val-d66ffacc",
+    "val-d05018ee",
+    "val-a8742d67",
+    "val-7ee312ef",
+    "val-3ab82796",
+    "val-8af84cfa",
+    "val-96bb5ff4",
+    "val-4709a950",
+    "val-4b6bd4d8",
+    "val-6a830019",
+    "val-42d4da83"
+  ],
+  "stage1": [
+    {
+      "name": "defaults",
+      "score": 0.0264,
+      "meanTime": null
+    },
+    {
+      "name": "eig1e-5-vis0.03",
+      "score": 0.8147999999999999,
+      "meanTime": 14.83
+    },
+    {
+      "name": "eig3e-6-vis0.03",
+      "score": 0.6091,
+      "meanTime": null
+    },
+    {
+      "name": "eig3e-6-vis0.01",
+      "score": 0.6091,
+      "meanTime": null
+    },
+    {
+      "name": "eig1e-5-vis0.03-brake",
+      "score": 1.1208999999999998,
+      "meanTime": 12.14
+    },
+    {
+      "name": "eig3e-6-vis0.03-steer",
+      "score": 1.3503,
+      "meanTime": 17.28
+    }
+  ],
+  "stage2": [
+    {
+      "name": "eig3e-6-vis0.03-steer",
+      "score": 0.5426999999999997,
+      "meanTime": null,
+      "summaries": [
+        {
+          "condition": "flow_baseline",
+          "runs": 12,
+          "completed": 0,
+          "completionRate": 0,
+          "completionCi95": [
+            0,
+            0.242
+          ],
+          "collisionFreeCompletions": 0,
+          "collisions": 0,
+          "runsWithCollision": 0,
+          "medianTimeToGoalS": null,
+          "meanTimeToGoalS": null,
+          "falseBrakingS": 30.76,
+          "meanFalseBrakingS": 2.563,
+          "medianMinGapM": 0.519,
+          "endReasons": {
+            "stall": 12
+          },
+          "meanProgress": 0.079,
+          "doorwayPassed": 0,
+          "debrisPassed": 0,
+          "debrisRuns": 6,
+          "neuralSteps": 0,
+          "neuralOver20Ms": 0,
+          "neuralOver50Ms": 0,
+          "neuralP95Ms": null,
+          "controllerOver20Ms": 0,
+          "controllerP95Ms": 1.568
+        },
+        {
+          "condition": "flow_baseline+range",
+          "runs": 12,
+          "completed": 0,
+          "completionRate": 0,
+          "completionCi95": [
+            0,
+            0.242
+          ],
+          "collisionFreeCompletions": 0,
+          "collisions": 0,
+          "runsWithCollision": 0,
+          "medianTimeToGoalS": null,
+          "meanTimeToGoalS": null,
+          "falseBrakingS": 35.8,
+          "meanFalseBrakingS": 2.983,
+          "medianMinGapM": 0.519,
+          "endReasons": {
+            "stall": 12
+          },
+          "meanProgress": 0.072,
+          "doorwayPassed": 0,
+          "debrisPassed": 0,
+          "debrisRuns": 6,
+          "neuralSteps": 0,
+          "neuralOver20Ms": 0,
+          "neuralOver50Ms": 0,
+          "neuralP95Ms": null,
+          "controllerOver20Ms": 0,
+          "controllerP95Ms": 1.504
+        }
+      ]
+    },
+    {
+      "name": "eig1e-5-vis0.03-brake",
+      "score": 0.8075999999999999,
+      "meanTime": null,
+      "summaries": [
+        {
+          "condition": "flow_baseline",
+          "runs": 12,
+          "completed": 0,
+          "completionRate": 0,
+          "completionCi95": [
+            0,
+            0.242
+          ],
+          "collisionFreeCompletions": 0,
+          "collisions": 6,
+          "runsWithCollision": 5,
+          "medianTimeToGoalS": null,
+          "meanTimeToGoalS": null,
+          "falseBrakingS": 29.64,
+          "meanFalseBrakingS": 2.47,
+          "medianMinGapM": 0.063,
+          "endReasons": {
+            "stall": 11,
+            "budget": 1
+          },
+          "meanProgress": 0.178,
+          "doorwayPassed": 2,
+          "debrisPassed": 0,
+          "debrisRuns": 6,
+          "neuralSteps": 0,
+          "neuralOver20Ms": 0,
+          "neuralOver50Ms": 0,
+          "neuralP95Ms": null,
+          "controllerOver20Ms": 0,
+          "controllerP95Ms": 1.367
+        },
+        {
+          "condition": "flow_baseline+range",
+          "runs": 12,
+          "completed": 0,
+          "completionRate": 0,
+          "completionCi95": [
+            0,
+            0.242
+          ],
+          "collisionFreeCompletions": 0,
+          "collisions": 0,
+          "runsWithCollision": 0,
+          "medianTimeToGoalS": null,
+          "meanTimeToGoalS": null,
+          "falseBrakingS": 28.56,
+          "meanFalseBrakingS": 2.38,
+          "medianMinGapM": 0.185,
+          "endReasons": {
+            "stall": 9,
+            "budget": 3
+          },
+          "meanProgress": 0.213,
+          "doorwayPassed": 1,
+          "debrisPassed": 0,
+          "debrisRuns": 6,
+          "neuralSteps": 0,
+          "neuralOver20Ms": 0,
+          "neuralOver50Ms": 0,
+          "neuralP95Ms": null,
+          "controllerOver20Ms": 0,
+          "controllerP95Ms": 1.524
+        }
+      ]
+    }
+  ],
+  "candidates": {
+    "defaults": {
+      "flow": {},
+      "command": {}
+    },
+    "eig1e-5-vis0.03": {
+      "flow": {
+        "minEigen": 0.00001
+      },
+      "command": {
+        "minVisualConfidence": 0.03,
+        "fullVisualConfidence": 0.2
+      }
+    },
+    "eig3e-6-vis0.03": {
+      "flow": {
+        "minEigen": 0.000003
+      },
+      "command": {
+        "minVisualConfidence": 0.03,
+        "fullVisualConfidence": 0.2
+      }
+    },
+    "eig3e-6-vis0.01": {
+      "flow": {
+        "minEigen": 0.000003
+      },
+      "command": {
+        "minVisualConfidence": 0.01,
+        "fullVisualConfidence": 0.1
+      }
+    },
+    "eig1e-5-vis0.03-brake": {
+      "flow": {
+        "minEigen": 0.00001
+      },
+      "command": {
+        "minVisualConfidence": 0.03,
+        "fullVisualConfidence": 0.2,
+        "brakeTimeS": 0.8,
+        "stopDistanceM": 0.6
+      }
+    },
+    "eig3e-6-vis0.03-steer": {
+      "flow": {
+        "minEigen": 0.000003
+      },
+      "command": {
+        "minVisualConfidence": 0.03,
+        "fullVisualConfidence": 0.2,
+        "centeringGain": 1.5,
+        "avoidGain": 1.2
+      }
+    }
+  },
+  "wallS": 696
+}

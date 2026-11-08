@@ -1,0 +1,44 @@
+.console {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--panel);
+  font-size: 13px;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-weight: 700;
+}
+
+.status {
+  color: var(--muted);
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.status[data-tone="warn"] {
+  color: var(--warn, #e0b25b);
+}
+
+.mirror {
+  /* The device screen is 320 × 240 px; the canvas keeps that aspect. */
+  display: block;
+  width: min(100%, 320px);
+  aspect-ratio: 4 / 3;
+  margin-top: 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.summary {
+  cursor: pointer;
+  color: var(--muted);
+}

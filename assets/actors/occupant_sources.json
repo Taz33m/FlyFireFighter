@@ -1,0 +1,22 @@
+{
+  "schema": "flyfirefighter.actor-sources/1",
+  "note": "Pinned inputs for build_occupant.py. Files are fetched into the git-ignored cache (assets/cache/characters/rocketbox/) by fetch_rocketbox.py and verified by SHA-256 before every build. Rocketbox avatars are artist-made (sculpted), not scans.",
+  "repository": "https://github.com/microsoft/Microsoft-Rocketbox",
+  "commit": "0943055db6ec570bcef9f2c8b41c9e5467c808f9",
+  "licence": { "spdx": "MIT", "copyright": "Copyright (c) 2020 Microsoft", "file": "repo/LICENSE.md" },
+  "files": [
+    { "role": "licence", "path": "repo/LICENSE.md", "repoPath": "LICENSE.md", "sha256": "17474e386e0b9e1a700cc3d06b2b0882a2c376d9c6b49c7f8274409b8f8d2352" },
+    { "role": "readme", "path": "repo/README.md", "repoPath": "README.md", "sha256": "bcf8013e3d5817a5dee5d1770b9943278189cd76b2d9b2abc243db99b703ecd6" },
+    { "role": "avatar", "path": "avatar/Male_Adult_01/Export/Male_Adult_01.fbx", "repoPath": "Assets/Avatars/Adults/Male_Adult_01/Export/Male_Adult_01.fbx", "sha256": "8d1edb51b4dc3427ae2456f4407fc105532c145dd019e53cd42bab31cc948a29" },
+    { "role": "texture.body.color", "path": "avatar/Male_Adult_01/Textures/m002_body_color.tga", "repoPath": "Assets/Avatars/Adults/Male_Adult_01/Textures/m002_body_color.tga", "sha256": "6a048a6b2140a1f5293798ca286be64fd0de6d79572e1273ff5765bd578f463f" },
+    { "role": "texture.body.normal", "path": "avatar/Male_Adult_01/Textures/m002_body_normal.tga", "repoPath": "Assets/Avatars/Adults/Male_Adult_01/Textures/m002_body_normal.tga", "sha256": "c9892e80c56890f6f5365627835286c2d4d2cc34cc473f6788fe3d560a52fb69" },
+    { "role": "texture.head.color", "path": "avatar/Male_Adult_01/Textures/m002_head_color.tga", "repoPath": "Assets/Avatars/Adults/Male_Adult_01/Textures/m002_head_color.tga", "sha256": "f5b64e4894930d438f7c419c3c9d0bba1f95fa4de9af078b762ea55bfca1ab85" },
+    { "role": "texture.head.normal", "path": "avatar/Male_Adult_01/Textures/m002_head_normal.tga", "repoPath": "Assets/Avatars/Adults/Male_Adult_01/Textures/m002_head_normal.tga", "sha256": "5ef5ae404c9276f17641e392d0d4bdbe5fb23e94f28238b23a381e6a357c42ea" },
+    { "role": "texture.hair.color_alpha", "path": "avatar/Male_Adult_01/Textures/m002_opacity_color.tga", "repoPath": "Assets/Avatars/Adults/Male_Adult_01/Textures/m002_opacity_color.tga", "sha256": "53818d3f45519451edd2bc60d6e59cd4057ecd381827463c5503da0439d0a5cf" },
+    { "role": "clip.idle", "clip": "idle", "path": "animations/all_animations_max_motextr_static/m_idle_breathe_01.max.fbx", "repoPath": "Assets/Animations/all_animations_max_motextr_static/m_idle_breathe_01.max.fbx", "sha256": "281735704260d96e882d13e3c77d0ede00ed5d2e40805cd305000b3e5cbb1090" },
+    { "role": "clip.crouch", "clip": "crouch", "path": "animations/all_animations_max_motextr_static/m_crouch_idle.max.fbx", "repoPath": "Assets/Animations/all_animations_max_motextr_static/m_crouch_idle.max.fbx", "sha256": "d3704294853eda39d566cb31b0e6a6c50bd3cc3c1bda9102c1156c1537c12eeb" },
+    { "role": "clip.cough", "clip": "cough", "path": "animations/all_animations_max_motextr_static/m_idle_cough_01.max.fbx", "repoPath": "Assets/Animations/all_animations_max_motextr_static/m_idle_cough_01.max.fbx", "sha256": "273b3e91a1c57ab53f1b517216010601fbfb33c649525f7960045fdc5f05e738" },
+    { "role": "clip.walk", "clip": "walk", "path": "animations/all_animations_max_motextr_xy/m_walk_neutral_01.max.fbx", "repoPath": "Assets/Animations/all_animations_max_motextr_xy/m_walk_neutral_01.max.fbx", "sha256": "e6805ae6b6b49fe10f06c1b17b14ddde90d09b9fea689ac34793df252f44dcd0" },
+    { "role": "clip.follow", "clip": "follow", "path": "animations/all_animations_max_motextr_xy/m_walk_slow_01.max.fbx", "repoPath": "Assets/Animations/all_animations_max_motextr_xy/m_walk_slow_01.max.fbx", "sha256": "8c5e5ed18be9e1062a26d230677d2801a679c70fd67f8aa8de14ff37f6d20577" }
+  ]
+}
