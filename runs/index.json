@@ -1,1 +1,1 @@
-{"runs":[{"id":"flyvis-take","label":"Recorded simulation run: live FlyVis take, Nov 8 2026"}]}
+{"runs":[{"id":"smooth-rescue","label":"Recorded simulation run: full rescue with FlyVis, Nov 8 2026 (scripted commander approvals)"},{"id":"flyvis-take","label":"Recorded simulation run: live FlyVis take with a human commander, Nov 8 2026"}]}

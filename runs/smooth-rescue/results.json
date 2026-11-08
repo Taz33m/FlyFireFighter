@@ -1,0 +1,126 @@
+{
+  "schema": "flyfirefighter.results/1",
+  "label": "simulation — Troy training scene: real exterior reference; fictional interior and incident",
+  "runId": "run-demo-demo-001-engineered_readout",
+  "status": "ended",
+  "scenarioId": "troy-training/main",
+  "seed": "demo-001",
+  "config": {
+    "scenarioId": "troy-training/main",
+    "seed": "demo-001",
+    "aircraftId": "tender-t1",
+    "controller": "engineered_readout",
+    "decider": "local",
+    "commanderId": "scripted-commander",
+    "speed": 1
+  },
+  "conditions": {
+    "rangeAssist": true,
+    "initialWaterL": 1
+  },
+  "scene": {
+    "sceneId": "troy-training",
+    "revision": 1,
+    "schema": "flyfirefighter.scene-meta/1",
+    "metaSha256": "1ac146daf86ed2bea214eaed0c601ec7f9e5e82ccf1ad79a1f6283adecb8418e",
+    "metaCanonicalSha256": "61e6cdae5bd409462e7b078254e90576a39196404a44b97c96be1b5bb2f474e8",
+    "assets": {
+      "scene.glb": {
+        "sha256": "316f799863145be08defdb4dc68abd4f39c0b16cd1fab79f903ba65f7cab8a06",
+        "bytes": 936504
+      },
+      "colliders.glb": {
+        "sha256": "8469c0004ed6861fccf13d17f18b5c469d42134920798b71ce8dc3964774e23b",
+        "bytes": 346680
+      }
+    }
+  },
+  "controller": {
+    "mode": "engineered_readout",
+    "label": "FlyVis flow/0000/000 + engineered readout",
+    "source": "engineered_readout",
+    "model": "flow/0000/000",
+    "checkpointSha256": "d0e42857e738d0315897c2d50fde9eb3fb1a3fb1f071d55dfc13d53d72bccc3f",
+    "neuralStatus": "active"
+  },
+  "decider": {
+    "label": "Local planner",
+    "status": "Local planner (no cloud model selected for this run)"
+  },
+  "camera": {
+    "calibrationId": "rgb-front/v1",
+    "renderers": [
+      "headless-collider/v1"
+    ]
+  },
+  "events": {
+    "file": "events.jsonl",
+    "sha256": "1199fcc26422d1dcaa6be767008d7b4edb705e61774c78408d468b3dfcf36d24",
+    "count": 139
+  },
+  "replay": {
+    "file": "replay.jsonl",
+    "sha256": "04579a091b47a3ffa3caecc464eceb3bf92a0ae7d6573b3c3eb89e9481a1115a",
+    "frames": 1986,
+    "label": "simulation truth for the labelled replay view"
+  },
+  "outcome": {
+    "rescueLabel": "simulated_evacuation_completed",
+    "droneReturn": "failed_no_supported_maneuver",
+    "violations": 0,
+    "evidence": "simulation_evaluator"
+  },
+  "result": {
+    "label": "simulation_evaluator",
+    "runId": "run-demo-demo-001-engineered_readout",
+    "seed": "demo-001",
+    "endedTick": 19860,
+    "budgetTick": 60000,
+    "occupants": [
+      {
+        "label": "simulation_evaluator",
+        "occupantKey": "occupant-1",
+        "outcome": "reached_assembly_point",
+        "arrivalTick": 11289
+      }
+    ],
+    "violations": [],
+    "droneReturn": "failed_no_supported_maneuver"
+  },
+  "timing": {
+    "note": "Wall-clock measurements on this machine; metrics only, never read by the simulation.",
+    "simulatedS": 198.6,
+    "wallMs": 191761.246,
+    "simToWallRatio": null,
+    "latency": {
+      "tick": {
+        "count": 19860,
+        "meanMs": 9.652,
+        "p50Ms": 8.901,
+        "p95Ms": 22.62,
+        "maxMs": 451.042
+      },
+      "frame": {
+        "count": 9930,
+        "meanMs": 3.799,
+        "p50Ms": 4.075,
+        "p95Ms": 4.743,
+        "maxMs": 60.704
+      },
+      "render": {
+        "count": 9930,
+        "meanMs": 3.783,
+        "p50Ms": 4.06,
+        "p95Ms": 4.726,
+        "maxMs": 60.684
+      },
+      "controller": {
+        "count": 9930,
+        "meanMs": 5.916,
+        "p50Ms": 5.691,
+        "p95Ms": 6.915,
+        "maxMs": 104.27
+      }
+    }
+  }
+}
