@@ -29,6 +29,14 @@ export interface HarnessPolicy {
    * along it, so a hazard seen on it stops the guidance.
    */
   readonly routeEvidenceMaxAgeTicks: Tick;
+  /**
+   * DEMO SETTING (true in this build; false restores the full rule). Route support then takes rooms and openings
+   * from what was seen before the last intervention too: route rooms need no fresh person-search fraction, and an
+   * unobserved opening takes its plan state. It still needs every fire on or beside the route seen out after the
+   * intervention, and it cites only observations captured after the intervention, so H15 holds unchanged. Without
+   * it the post-suppression sweep of every route room and door took about 85 s before guidance could start.
+   */
+  readonly routeSupportRelaxed: boolean;
   /** Coverage of an affected region must be at least this recent at every check. */
   readonly coverageFreshTicks: Tick;
   /** Evacuation-route assessments older than this cannot support guidance. */
@@ -123,12 +131,20 @@ export const DEFAULT_POLICY: HarnessPolicy = deepFreeze({
   maxProposalLifetimeTicks: 6000,
   citedEvidenceMaxAgeTicks: 3000,
   routeEvidenceMaxAgeTicks: 6000,
+  routeSupportRelaxed: true,
   coverageFreshTicks: 200,
   routeFreshTicks: 500,
   returnRouteFreshTicks: 3000,
   minCoverageQuality: 0.3,
-  minCoverageFraction: 0.95,
-  breachMinCoverageFraction: 0.65,
+  /**
+   * DEMO SETTING (was 0.95): fresh person-search coverage a spray's region needs. At 0.95 the demo's first spray was
+   * invalidated at 93.5% and resubmitted at 94.9%, stalling 74 s. A possible person detected or tracked near the
+   * region still refuses the spray outright (H6 detection and track findings are unchanged).
+   */
+  minCoverageFraction: 0.8,
+  // Demo setting (live recording): the debris region needs 30% fresh person-search coverage, not 65%. Detections and
+  // tracks near the region still block the breach outright (personMarginM), and the commander still approves it.
+  breachMinCoverageFraction: 0.3,
   coverageSpacingM: 0.25,
   personConfidenceThreshold: PERSON_DETECTION_CONFIDENCE,
   personMarginM: 1.0,

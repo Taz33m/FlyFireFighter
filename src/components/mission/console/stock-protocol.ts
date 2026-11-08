@@ -43,20 +43,23 @@ export type ConsoleMessage =
   /** The answer to `?`: the product string, e.g. "FWOG main ogfw 024", and its version number when present. */
   | { readonly type: "identity"; readonly product: string; readonly version: number | null; readonly seq: number }
   /** A plain text line: menu text, or another firmware's or CPU's banner. */
-  | { readonly type: "line"; readonly text: string; readonly banner: "wilidoro" | "ogfw_display" | null };
+  | { readonly type: "line"; readonly text: string; readonly banner: "wilidoro" | "ogfw_display" | null }
+  /** Raw file bytes requested with ConsoleParser.expectRaw (legacy readback). */
+  | { readonly type: "raw"; readonly bytes: Uint8Array };
 
 /** A partial frame or line longer than this is junk and is dropped. */
 export const MAX_PENDING_CHARS = 1024;
 
 const FRAME = /^\[(\*[A-Za-z0-9_]+|[A-Za-z0-9?](?:\\[A-Za-z0-9])*) ([0-9A-Fa-f]+) (\d+) (.+) ([01])\]$/;
-const LEVELS = /^[01] [01] [01] [01] [01]$/;
+// Stock OG v024 sends 0/1; legacy v54 answers read-all-buttons as hex bytes (SDK response_as_bytes).
+const LEVELS = /^[0-9A-Fa-f]{1,2}( [0-9A-Fa-f]{1,2}){4}$/;
 const WILIDORO = /^\[wilidoro\]/;
 const OGFW_DISPLAY = /^\[ogfw_display\]/;
 
 function levelsFrom(response: string): ButtonLevels | null {
   const text = response.trim();
   if (!LEVELS.test(text)) return null;
-  const [gray, yellow, green, blue, red] = text.split(" ").map(v => v === "1");
+  const [gray, yellow, green, blue, red] = text.split(" ").map(v => parseInt(v, 16) !== 0);
   return { gray, yellow, green, blue, red };
 }
 
@@ -73,10 +76,10 @@ export function parseFrame(raw: string): ConsoleMessage | null {
   }
   if (kind.startsWith("*")) return { type: "event", name: kind.slice(1), seq };
   if (kind === "?" && success === "1") {
-    const version = /\b(\d{3})$/.exec(response.trim());
+    const version = /v?(\d{2,3})$/.exec(response.trim());
     return { type: "identity", product: response.trim(), version: version === null ? null : Number(version[1]), seq };
   }
-  if (kind === "g\\u" && success === "1") {
+  if ((kind === "g\\u" || kind === "u") && success === "1") {
     const levels = levelsFrom(response);
     if (levels !== null) return { type: "buttons", levels, seq, source: "poll" };
   }
@@ -96,22 +99,56 @@ function lineMessage(text: string): ConsoleMessage | null {
  */
 export class ConsoleParser {
   private pending = "";
-  private readonly decoder = new TextDecoder("latin1");
+  /** Raw bytes still expected for a legacy readback, and those collected so far. */
+  private rawWanted = 0;
+  private rawMagic: string | null = null;
+  private raw: number[] = [];
+
+  /**
+   * The next `count` bytes are file payload, not text. With `magic`, bytes before the payload's known first bytes
+   * (a line ending after the handshake frame) are skipped, at most 4 of them.
+   */
+  expectRaw(count: number, magic: string | null = null): void {
+    this.rawWanted = count;
+    this.rawMagic = magic;
+    this.raw = [];
+  }
 
   push(bytes: Uint8Array): ConsoleMessage[] {
-    this.pending += this.decoder.decode(bytes, { stream: true });
+    // Byte-for-byte (true Latin-1), so raw file bytes survive the text buffer unchanged.
+    for (let i = 0; i < bytes.length; i += 4096) this.pending += String.fromCharCode(...bytes.subarray(i, i + 4096));
     const out: ConsoleMessage[] = [];
+    const raw = this.takeRaw();
+    if (raw !== null) out.push(raw);
     for (;;) {
       const step = this.next();
       if (step === null) break;
       if (step.message !== null) out.push(step.message);
     }
-    if (this.pending.length > MAX_PENDING_CHARS) this.pending = "";
+    if (this.pending.length > MAX_PENDING_CHARS && this.rawWanted === 0) this.pending = "";
     return out;
+  }
+
+  private takeRaw(): ConsoleMessage | null {
+    if (this.rawWanted === 0) return null;
+    if (this.raw.length === 0 && this.rawMagic !== null) {
+      const at = this.pending.indexOf(this.rawMagic);
+      if (at === -1) return null;
+      if (at > 4) { this.rawWanted = 0; return null; }
+      this.pending = this.pending.slice(at);
+      this.rawMagic = null;
+    }
+    const take = Math.min(this.rawWanted - this.raw.length, this.pending.length);
+    for (let i = 0; i < take; i++) this.raw.push(this.pending.charCodeAt(i) & 0xff);
+    this.pending = this.pending.slice(take);
+    if (this.raw.length < this.rawWanted) return null;
+    this.rawWanted = 0;
+    return { type: "raw", bytes: Uint8Array.from(this.raw) };
   }
 
   /** Consume one item from the front of the buffer; null when more bytes are needed. */
   private next(): { readonly message: ConsoleMessage | null } | null {
+    if (this.rawWanted > 0) return null;
     const open = this.pending.indexOf("[");
     const newline = this.pending.indexOf("\n");
     if (newline !== -1 && (open === -1 || newline < open)) return this.takeLine(newline);
@@ -204,4 +241,89 @@ export function encodeCommand(cmd: ConsoleCommand): Uint8Array {
   const bytes = new Uint8Array(text.length);
   for (let i = 0; i < text.length; i++) bytes[i] = text.charCodeAt(i) & 0x7f;
   return bytes;
+}
+
+/* Legacy FREE-WILi firmware v54 (display CPU port), as the freewili 0.0.51 SDK drives it: multi-line menu commands
+ * after Ctrl-B, and the raw file transfer of fw_serial.py send_file / get_file. Images are content-addressed
+ * FF<6 hex>.FWI files in /images (8.3 names, as the firmware requires); nothing else on the filesystem is touched. */
+
+/** Our image names: "FF" + 6 hex digits + ".FWI" (8.3). */
+export const IMAGE_NAME = /^FF[0-9A-F]{6}\.FWI$/;
+/** Payload chunk size for uploads (the SDK default; below 1024 the SDK saw firmware resets). */
+export const UPLOAD_CHUNK = 32768;
+
+export type LegacyCommand =
+  | { readonly kind: "reset" }
+  | { readonly kind: "identify" }
+  | { readonly kind: "button_events"; readonly intervalMs: number }
+  | { readonly kind: "read_buttons" }
+  | { readonly kind: "show_text"; readonly text: string }
+  | { readonly kind: "clear_text" }
+  | { readonly kind: "show_image"; readonly name: string }
+  | { readonly kind: "put_image"; readonly name: string; readonly size: number; readonly crc32: number }
+  | { readonly kind: "get_image"; readonly name: string };
+
+function imageName(name: string): string {
+  if (!IMAGE_NAME.test(name)) throw new RangeError(`Refusing an image name outside the console's own set: ${name}`);
+  return name;
+}
+
+function putHeader(name: string, size: number, crc: number): string {
+  const sizeOk = Number.isSafeInteger(size) && size > 0 && size <= 1_000_000;
+  const crcOk = Number.isSafeInteger(crc) && crc >= 0 && crc <= 0xffffffff;
+  if (!sizeOk || !crcOk) throw new RangeError("Invalid upload size or checksum");
+  return `x\nf\n/images/${imageName(name)} ${size} ${crc}\n`;
+}
+
+function legacyText(cmd: LegacyCommand): string {
+  switch (cmd.kind) {
+    case "reset": return `${CTRL_B}\n`;
+    case "identify": return `${CTRL_B}?\n`;
+    case "button_events": {
+      const ms = cmd.intervalMs === 0 ? 0 : Math.min(1000, Math.max(20, Math.round(cmd.intervalMs)));
+      return `g\no\n${Number.isFinite(ms) ? ms : 0}\n`;
+    }
+    case "read_buttons": return "g\nu\n";
+    case "show_text": return `g\np\n${sanitizeDisplayText(cmd.text) || "-"}\n`;
+    case "clear_text": return "g\nt\n";
+    case "show_image": return `g\nl\n${imageName(cmd.name)}\n`;
+    case "put_image": return putHeader(cmd.name, cmd.size, cmd.crc32);
+    case "get_image": return `x\nu\n\\images\\${imageName(cmd.name)} \n`;
+  }
+}
+
+/**
+ * The bytes for one allowed legacy command (payload bytes of an accepted upload are written separately). Each menu
+ * command starts with Ctrl-B, as the SDK sends before every call: legacy menus stay in the last submenu otherwise,
+ * and the next command would be read in the wrong menu.
+ */
+export function encodeLegacy(cmd: LegacyCommand): Uint8Array {
+  const text = cmd.kind === "reset" || cmd.kind === "identify" ? legacyText(cmd) : `${CTRL_B}\n${legacyText(cmd)}`;
+  const bytes = new Uint8Array(text.length);
+  for (let i = 0; i < text.length; i++) bytes[i] = text.charCodeAt(i) & 0x7f;
+  return bytes;
+}
+
+const CRC_TABLE = (() => {
+  const table = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    table[n] = c >>> 0;
+  }
+  return table;
+})();
+
+/** zlib.crc32, as the SDK computes the upload checksum. */
+export function crc32(bytes: Uint8Array): number {
+  let c = 0xffffffff;
+  for (const b of bytes) c = CRC_TABLE[(c ^ b) & 0xff] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+/** Split an upload payload into the chunks the SDK writes. */
+export function uploadChunks(bytes: Uint8Array, chunk: number = UPLOAD_CHUNK): Uint8Array[] {
+  const out: Uint8Array[] = [];
+  for (let i = 0; i < bytes.length; i += chunk) out.push(bytes.subarray(i, i + chunk));
+  return out;
 }

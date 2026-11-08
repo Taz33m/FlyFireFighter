@@ -64,14 +64,14 @@ export const COOL_LOOK_TICKS = 18_000;
  * so the next plan retries from the station. At 250 ticks the plan after a 150-tick dwell found the spray still
  * cooling, chose a second look at the lead instead, and the aircraft left the station.
  */
-export const COOL_COVERAGE_TICKS = 150;
+export const COOL_COVERAGE_TICKS = 30;
 /** Dwell on station (no planning) so person-search coverage of the affected region builds up. */
-export const DWELL_TICKS = 150;
+export const DWELL_TICKS = 30;
 /** An intervention is proposed only once the aircraft faces its focus within this (its cameras search the region). */
 export const FACE_TOLERANCE_RAD = (10 * Math.PI) / 180;
 /** Planning pause per wait for the turn to finish, and the most waits per candidate before proposing anyway. */
-export const FACE_WAIT_TICKS = 50;
-export const MAX_FACE_WAITS = 6;
+export const FACE_WAIT_TICKS = 25;
+export const MAX_FACE_WAITS = 3;
 
 /** What an intervention acts on: a spray's aim, a breach's strike point, a release point. */
 function actionFocus(action: ProposalInput["action"]): Vec3 | null {
@@ -354,7 +354,8 @@ export class MissionPlanner {
     if (look === null) return;
     const record = t.harness.record(look.proposalId);
     if (record !== null && !TERMINAL_STATUSES.includes(record.status)) return;
-    if (look.kind === "window") this.cool(look.candidateId, t.ctx.tick + COOL_LOOK_TICKS);
+    // Demo: a window look cools once it arrived (its pane was seen); one stopped on the way may be offered again.
+    if (look.kind === "window" && record?.status === "completed") this.cool(look.candidateId, t.ctx.tick + COOL_LOOK_TICKS);
     else if (record?.status === "completed") this.cool(look.candidateId, t.ctx.tick + COOL_SECOND_LOOK_TICKS);
     this.look = null;
   }
@@ -423,7 +424,7 @@ export class MissionPlanner {
     const record = t.harness.record(this.focusId);
     if (record === null || TERMINAL_STATUSES.includes(record.status)) return this.endFocus(record, t);
     if (record.status === "executing") return this.endDwell(`${record.proposal.action.kind} proposal ${record.proposal.id} is executing and holds the station itself`, t);
-    const station = stationGoal(record.proposal);
+    const station = stationGoal(record.proposal, t.ctx.profile.modules.glassBreaker?.reachM ?? 0);
     const ready = onStation(record.proposal, t.ctx);
     if (record.status === "approved" && ready && record.approval !== null) {
       t.harness.requestExecution({ type: "execute", runId: t.harness.runId, proposalId: record.proposal.id, digest: record.proposal.digest, requestId: `${record.proposal.id}#run`, tick: t.ctx.tick }, t.ctx);
@@ -534,7 +535,7 @@ export class MissionPlanner {
     this.endDwell("its intervention ended", t);
     this.focusId = null;
     this.stationId = null;
-    this.lastPlanTick = -Infinity;
+    this.lastPlanTick = nextPlanAfter(record, t.ctx.tick);
     if (coverageOnly && meta !== undefined) {
       this.cool(meta.candidateId, t.ctx.tick + COOL_COVERAGE_TICKS);
       this.afterCoverageRefusal(meta, t);
@@ -561,7 +562,11 @@ export class MissionPlanner {
       return;
     }
     const active = t.harness.activeMotion();
-    if (active !== null && this.meta.get(active.proposal.id)?.role === "candidate") this.stopMotion(active.proposal, `superseded by the move to the standoff of ${meta.candidateId ?? "an intervention"}`, t);
+    const activeMeta = active === null ? undefined : this.meta.get(active.proposal.id);
+    // A move already flying to this station (a window look ends on its breach standoff) carries on: its arrival is the
+    // preposition, and the plan on arrival proposes from there. No stop and restart on the way.
+    if (activeMeta?.role === "candidate" && activeMeta.station !== null && distance(activeMeta.station, station) <= STILL_OFFERED_M) return;
+    if (active !== null && activeMeta?.role === "candidate") this.stopMotion(active.proposal, `superseded by the move to the standoff of ${meta.candidateId ?? "an intervention"}`, t);
     if (t.harness.activeMotion() === null) this.preposition(station, meta, t);
   }
 
@@ -674,6 +679,15 @@ export function guidedTracks(records: readonly ProposalRecord[]): GuidedTrack[] 
   });
 }
 
+/**
+ * The lastPlanTick to set when an intervention ends: after a completed strike, plan again once the cameras have reported
+ * the broken pane (PLAN_PERIOD_TICKS later), not on the very tick it completes, when the evidence still shows it closed
+ * and the plan would start a move it drops half a second later; otherwise plan at once.
+ */
+function nextPlanAfter(record: ProposalRecord | null, tick: Tick): Tick {
+  return record?.status === "completed" && record.proposal.action.kind === "breach_opening" ? tick : -Infinity;
+}
+
 /** An intervention that ended, other than completed or rejected by the commander, for missing coverage alone. */
 function endedForCoverage(record: ProposalRecord | null): boolean {
   return record !== null && record.status !== "completed" && record.status !== "rejected" && coverageOnlyFindings(record.findings);
@@ -750,11 +764,12 @@ export function proposeNearM(action: ProposalInput["action"], ctx: HarnessContex
  * long before the goal, and the harness's 0.3 m arrival tolerance can only end the move within reach of the
  * strike point; execution starts as soon as onStation holds.
  */
-export function stationGoal(proposal: ActionProposal): Vec3 | null {
+export function stationGoal(proposal: ActionProposal, reachM = 0): Vec3 | null {
   const action = proposal.action;
   if (action.kind !== "breach_opening") return stationOf(proposal);
   const d = distance(action.standoff, action.strikePoint);
-  if (d <= BREACH_DOCK_M) return action.standoff;
+  // A striker that reaches the pane from the standoff (with the strike margin) needs no docking: hold the standoff.
+  if (d <= BREACH_DOCK_M || d <= reachM - STRIKE_MARGIN_M) return action.standoff;
   const k = BREACH_DOCK_M / d;
   const s = action.strikePoint;
   return { x: s.x + (action.standoff.x - s.x) * k, y: s.y + (action.standoff.y - s.y) * k, z: s.z + (action.standoff.z - s.z) * k };

@@ -41,8 +41,19 @@ export const MISSION_COMMAND_CONFIG: CommandConfig = Object.freeze({
   ...DEFAULT_COMMAND_CONFIG,
   cruiseSpeedMps: 1.8,
   exploreSpeedMps: 0.8,
+  // Smooth demo flight (2026-11-08): the vision and pose scales slowed the aircraft for most of the live run
+  // ("Slowed · low visibility", "position uncertain") although the planar lidar covered it; the metric range
+  // limits (forward brake, flank, lateral bounds) are unchanged and still bound every approach.
   minVisualConfidence: 0.05,
-  fullVisualConfidence: 0.3,
+  fullVisualConfidence: 0.15,
+  poseSigmaOkM: 0.6,
+  poseSigmaMaxM: 2.0,
+  minPoseSpeedScale: 0.75,
+  rangeOnlySpeedMps: 0.8,
+  // A lidar-clear space ahead (a return 3 m out or none ahead) is known: cruise, not exploration speed.
+  rangeKnownM: 3,
+  // Turn while moving toward a goal off the nose instead of nearly stopping to turn.
+  turnSpeedExponent: 0.5,
 });
 
 /**
@@ -67,6 +78,12 @@ export const DOCKING_COMMAND_CONFIG: CommandConfig = Object.freeze({
   lateralClearanceM: 0.3,
   rangeOnlySpeedMps: 0.25,
   arrivalRadiusM: 0.15,
+  // Indoors and at apertures, in smoke: the original vision ramp (a faster range-only crawl measures spurious
+  // looming in smoke), no range-known cruise, and turns toward an off-nose goal before moving on. The pose
+  // relaxation from the cruise settings is kept.
+  fullVisualConfidence: 0.3,
+  rangeKnownM: Infinity,
+  turnSpeedExponent: 1,
 });
 
 /**

@@ -1,7 +1,6 @@
 /**
  * The look before a breach, closed loop: MissionRuntime on the Troy main preset (headless collider camera, optical-flow
- * baseline, local planner, scripted commander, the default report), run until the planner's first dwell at a breach
- * station has lasted DWELL_TICKS. H6 judges a breach by how much of its debris region a person search covered in the
+ * baseline, local planner, scripted commander, the default report), run until the first breach is approved and struck. H6 judges a breach by how much of its debris region a person search covered in the
  * last 200 ticks (harness rules.ts breachCoverageAssessment), so the aircraft must keep its forward cameras on the pane
  * while it dwells. Scope: the controller settings the runtime selects for that dwell, the aircraft's heading relative
  * to the strike point at its end, and H6's own measure of the debris region's coverage from the runtime's belief. It
@@ -21,7 +20,6 @@ import type { MissionEvent } from "../contracts/events.ts";
 import type { BeliefSnapshot } from "../contracts/evidence.ts";
 import { vec3 } from "../contracts/frames.ts";
 import { box, sphere } from "../contracts/geometry.ts";
-import type { ProposalId } from "../contracts/ids.ts";
 import { deepFreeze } from "../contracts/ids.ts";
 import { affectedRegion } from "../harness/effects.ts";
 import { DEFAULT_POLICY } from "../harness/policy.ts";
@@ -30,67 +28,60 @@ import { buildCandidateSet } from "../navigation/planner/candidates.ts";
 import { observation } from "../navigation/planner/test-fixtures.ts";
 import { floorPlanPriorFromScene } from "../simulation/prior.ts";
 import { driveMission, troyMeta } from "./mission-driver.ts";
-import { DWELL_TICKS, facingErrorRad, FACE_TOLERANCE_RAD } from "./planner-step.ts";
-import type { MissionRuntime } from "./runtime.ts";
+import { facingErrorRad, FACE_TOLERANCE_RAD } from "./planner-step.ts";
 
 type BreachSpec = Extract<ActionSpec, { readonly kind: "breach_opening" }>;
 
-interface Dwell {
-  readonly scanId: ProposalId;
-  readonly startTick: number;
+interface AtApproval {
+  readonly tick: number;
   readonly breach: BreachSpec;
+  readonly facingRad: number | null;
+  readonly fraction: number;
+  readonly text: string;
 }
 
-/** The breach the planner is looking at: its latest preposition move's candidate and station. */
-function breachUnderLook(runtime: MissionRuntime): BreachSpec | null {
-  const metas = [...runtime.planner.meta.values()].reverse();
-  const preposition = metas.find(m => m.role === "preposition");
-  if (preposition?.candidateId?.startsWith("request_breach:") !== true || preposition.station === null) return null;
-  const openingId = preposition.candidateId.slice("request_breach:".length);
-  const opening = runtime.preset.prior.openings.find(o => o.id === openingId);
-  if (opening === undefined) return null;
-  const r3 = (v: number) => Math.round(v * 1000) / 1000;
-  return { kind: "breach_opening", openingId, standoff: preposition.station, strikePoint: { x: r3(opening.center.x), y: r3(opening.center.y), z: r3(opening.center.z) } };
-}
-
+/*
+ * DEMO: the window phase no longer prepositions and dwells. The first move is a look that ends on the entry window's
+ * breach standoff, the breach is proposed there after a short turn to face the pane, and the long striker (1.2 m) acts
+ * from that station without docking. The test therefore checks the hold while the commander decides (a dwell scan,
+ * which keeps the close-quarters settings) at the moment the scripted commander approves, and that the strike starts
+ * at once. H6 itself is unchanged; its breach floor is the demo policy's (DEFAULT_POLICY.breachMinCoverageFraction).
+ */
 describe("the look before a breach (Troy main preset, headless)", () => {
-  test("the first dwell at a breach station keeps the cameras on the pane: close-quarters settings, facing the strike point, H6 coverage at the breach floor", { timeout: 5 * 60_000 }, async () => {
-    let dwell: Dwell | null = null;
-    let end: { readonly tick: number; readonly facingRad: number | null; readonly fraction: number; readonly text: string } | null = null;
+  test("at the first breach approval the cameras are on the pane: close-quarters settings, facing the strike point, H6 coverage at the breach floor, and the strike starts at once", { timeout: 5 * 60_000 }, async () => {
+    let at: AtApproval | null = null;
     const run = await driveMission({
       runId: "run-breach-dwell",
       seed: "demo-001",
       maxTicks: 9000,
       until: runtime => {
-        const tick = runtime.world.tick;
-        if (dwell === null) {
-          const active = runtime.harness.activeMotion();
-          const breach = breachUnderLook(runtime);
-          if (active !== null && breach !== null && runtime.planner.meta.get(active.proposal.id)?.role === "dwell") dwell = { scanId: active.proposal.id, startTick: tick, breach };
-          return false;
+        const record = runtime.harness.records().find(r => r.proposal.action.kind === "breach_opening" && r.history.some(h => h.status === "approved"));
+        if (record === undefined || record.proposal.action.kind !== "breach_opening") return false;
+        if (at === null) {
+          const tick = runtime.world.tick;
+          const ctx = runtime.context(tick);
+          const breach = record.proposal.action;
+          const region = affectedRegion(breach, runtime.preset.scenario.profile, runtime.preset.prior);
+          assert.ok(region);
+          const assessment = breachCoverageAssessment(breach, region, ctx);
+          at = { tick, breach, facingRad: facingErrorRad(ctx.belief.pose, breach.strikePoint), fraction: assessment.fraction, text: assessment.text };
         }
-        if (tick < dwell.startTick + DWELL_TICKS - 1) return false;
-        const ctx = runtime.context(tick);
-        const region = affectedRegion(dwell.breach, runtime.preset.scenario.profile, runtime.preset.prior);
-        assert.ok(region);
-        const assessment = breachCoverageAssessment(dwell.breach, region, ctx);
-        end = { tick, facingRad: facingErrorRad(ctx.belief.pose, dwell.breach.strikePoint), fraction: assessment.fraction, text: assessment.text };
-        return true;
+        return record.status === "completed" || record.status === "invalidated" || record.status === "aborted";
       },
     });
     run.runtime.close();
-    assert.ok(dwell !== null, "the planner dwelt at a breach station");
-    assert.ok(end !== null, "the dwell lasted its full length");
-    const { scanId, breach } = dwell as Dwell;
-    const settled = end as { readonly tick: number; readonly facingRad: number | null; readonly fraction: number; readonly text: string };
-    // The settings in force at the end of the dwell: the latest switch at or before it (the move there switched to the
-    // close-quarters settings within DOCK_WITHIN_M of the station; before the fix the dwell scan switched back).
-    const modes = run.events.filter((e: MissionEvent) => (e.kind === "controller.docking" || e.kind === "controller.cruise") && e.tick <= settled.tick);
+    assert.ok(at !== null, "a breach was approved");
+    const approved = at as AtApproval;
+    const modes = run.events.filter((e: MissionEvent) => (e.kind === "controller.docking" || e.kind === "controller.cruise") && e.tick <= approved.tick);
     const inForce = modes[modes.length - 1];
-    assert.ok(inForce !== undefined && inForce.kind === "controller.docking", `controller settings at the end of the dwell at ${breach.openingId}: ${inForce === undefined ? "none" : `${inForce.kind} (${inForce.subject === scanId ? "the dwell scan" : inForce.subject}) — ${inForce.reason}`}`);
-    assert.ok(!modes.some(e => e.subject === scanId && e.kind === "controller.cruise"), "the dwell scan does not resume the cruise settings");
-    assert.ok(settled.facingRad !== null && settled.facingRad <= FACE_TOLERANCE_RAD, `heading ${settled.facingRad === null ? "?" : Math.round((settled.facingRad * 180) / Math.PI)}° off the strike point of ${breach.openingId} at t=${(settled.tick / 100).toFixed(2)} s`);
-    assert.ok(settled.fraction >= DEFAULT_POLICY.breachMinCoverageFraction, `${breach.openingId}: ${settled.text}`);
+    assert.ok(inForce !== undefined && inForce.kind === "controller.docking", `controller settings at the approval of ${approved.breach.openingId}: ${inForce === undefined ? "none" : `${inForce.kind} — ${inForce.reason}`}`);
+    assert.ok(approved.facingRad !== null && approved.facingRad <= FACE_TOLERANCE_RAD, `heading ${approved.facingRad === null ? "?" : Math.round((approved.facingRad * 180) / Math.PI)}° off the strike point of ${approved.breach.openingId} at t=${(approved.tick / 100).toFixed(2)} s`);
+    assert.ok(approved.fraction >= DEFAULT_POLICY.breachMinCoverageFraction, `${approved.breach.openingId}: ${approved.text}`);
+    const record = run.runtime.harness.records().find(r => r.proposal.action.kind === "breach_opening" && r.history.some(h => h.status === "approved"));
+    assert.ok(record !== undefined && record.status === "completed", `the breach ${record?.status ?? "was not found"}`);
+    const tickOf = (status: string) => record.history.find(h => h.status === status)?.tick ?? NaN;
+    assert.ok(tickOf("executing") - tickOf("approved") <= 5, `the strike starts on approval (approved ${tickOf("approved")}, executing ${tickOf("executing")})`);
+    assert.ok(tickOf("completed") - tickOf("approved") <= 100, "the glass breaks within about a second of approval");
   });
 });
 

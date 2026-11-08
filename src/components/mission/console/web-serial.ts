@@ -38,12 +38,15 @@ export function webSerial(): SerialLike | null {
   return serial ?? null;
 }
 
-/** Ask the user to choose a MAIN CPU port. Throws if they cancel or pick something else. */
+/**
+ * Ask the user to choose the console port: MAIN's "Board CDC" under OG firmware v024, or the DisplayCPU port under
+ * the legacy FREE-WILi firmware (full-screen images). The session's identify step refuses any other port.
+ */
 export async function requestConsolePort(serial: SerialLike): Promise<SerialPortLike> {
-  const port = await serial.requestPort({ filters: [{ usbVendorId: FREEWILI_USB_VENDOR_ID, usbProductId: FREEWILI_MAIN_PRODUCT_ID }] });
+  const port = await serial.requestPort({ filters: [FREEWILI_MAIN_PRODUCT_ID, FREEWILI_DISPLAY_PRODUCT_ID].map(usbProductId => ({ usbVendorId: FREEWILI_USB_VENDOR_ID, usbProductId })) });
   const info = port.getInfo();
-  if (info.usbVendorId !== FREEWILI_USB_VENDOR_ID || info.usbProductId !== FREEWILI_MAIN_PRODUCT_ID) {
-    throw new Error("That port is not the Free-WiLi MAIN CPU.");
+  if (info.usbVendorId !== FREEWILI_USB_VENDOR_ID || (info.usbProductId !== FREEWILI_MAIN_PRODUCT_ID && info.usbProductId !== FREEWILI_DISPLAY_PRODUCT_ID)) {
+    throw new Error("That port is not a Free-WiLi OG CPU.");
   }
   return port;
 }

@@ -279,12 +279,12 @@ describe("route assessor: fresh person-search coverage from the evidence store (
   const openings = (tick: number) =>
     Object.entries(STATES).map(([openingId, state]) => view(`opening-${openingId}-${tick}`, tick, null, { detections: [{ kind: "opening_state", openingId, state }] }));
   // Written against a 30 s route evidence age; the mechanism, not the default value, is under test.
-  const assess = (belief: BeliefSnapshot, lastInterventionTick = INTERVENTION) => assessRoute({ belief, tick: NOW, lastInterventionTick, policy: { ...DEFAULT_POLICY, routeEvidenceMaxAgeTicks: 3000 } }, evacuation());
+  const assess = (belief: BeliefSnapshot, lastInterventionTick = INTERVENTION) => assessRoute({ belief, tick: NOW, lastInterventionTick, policy: { ...DEFAULT_POLICY, routeEvidenceMaxAgeTicks: 3000, routeSupportRelaxed: false } }, evacuation());
 
   test("the drone's own return needs passable openings, not rooms searched for people; an occupant's route still does", () => {
     // Openings fresh, rooms never person-searched since the intervention.
     const belief = storeWith([...openings(NOW - 50)]);
-    const policy = { ...DEFAULT_POLICY, routeEvidenceMaxAgeTicks: 3000 };
+    const policy = { ...DEFAULT_POLICY, routeEvidenceMaxAgeTicks: 3000, routeSupportRelaxed: false };
     const drone = assessRoute({ belief, tick: NOW, lastInterventionTick: INTERVENTION, policy }, droneReturn());
     assert.equal(drone.status, "supported", drone.reason);
     assert.match(drone.reason, /need no person search for the drone's own passage/);
@@ -294,7 +294,7 @@ describe("route assessor: fresh person-search coverage from the evidence store (
   });
 
   test("a pane seen broken long ago stays passable for the drone; an occupant's door seen long ago does not", () => {
-    const policy = { ...DEFAULT_POLICY, routeEvidenceMaxAgeTicks: 3000 };
+    const policy = { ...DEFAULT_POLICY, routeEvidenceMaxAgeTicks: 3000, routeSupportRelaxed: false };
     // Every opening observed long ago, before the intervention, plus one fresh view of the bedroom: the drone's
     // way out through the broken bedroom pane is supported; the occupant's way through doors is not.
     const belief = storeWith([...openings(100), ...sweep(NOW - 50, { bedroom: ROOMS.bedroom })]);

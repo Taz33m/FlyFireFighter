@@ -144,7 +144,9 @@ export const TENDER_T1: AircraftProfile = deepFreeze({
   sensors: SEARCH_SENSORS,
   modules: {
     water: { tankL: 1.0, maxFlowLps: 0.2, nozzleDiameterMm: 4, coneHalfAngleDeg: 8, rangeM: 4 },
-    glassBreaker: { reachM: 0.45, debrisRadiusM: 1.5, strikeDelayTicks: 50 },
+    // Demo striker: a telescoping glass breaker reaching 1.2 m, so the aircraft strikes from the station it held for
+    // the look (no docking at the pane) and the glass breaks about 0.5 s after execution starts.
+    glassBreaker: { reachM: 1.2, debrisRadiusM: 1.5, strikeDelayTicks: 50 },
     payloadBay: { slots: 1, maxPayloadKg: 0.3 },
     lightCue: true,
     speaker: true,

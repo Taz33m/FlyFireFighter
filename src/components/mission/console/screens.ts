@@ -55,6 +55,8 @@ export type ScreenSpec =
     readonly digestPrefix: string;
     /** False during the review delay: approve is held. */
     readonly armed: boolean;
+    /** The device template for this kind of decision: no per-proposal target, coverage, countdown or digest. */
+    readonly template?: boolean;
   }
   | { readonly kind: "approved" | "rejected"; readonly action: GateAction; readonly title: string; readonly by: string; readonly viaConsole: boolean }
   | { readonly kind: "aborted"; readonly caption: string };
@@ -165,15 +167,20 @@ export interface ScreenInput {
   readonly armed: boolean;
 }
 
+const ABORTED_CAPTION = "Remaining actuation stops; the harness selects a contingency.";
+const AWAITING_REPORT = "Waiting for the caller's report";
+const AWAITING_AUTHORIZATION = "Waiting for mission authorization";
+
+
 export function deriveScreen({ view, rail, armed }: ScreenInput): ScreenSpec {
   if (view === null) return { kind: "no_run" };
-  if (view.status === "aborted") return { kind: "aborted", caption: "Remaining actuation stops; the harness selects a contingency." };
+  if (view.status === "aborted") return { kind: "aborted", caption: ABORTED_CAPTION };
   const pending = view.pendingApproval === null ? null : pendingScreen(view, view.pendingApproval, armed);
   if (pending !== null) return pending;
   const decided = recentDecision(view);
   if (decided !== null) return decided;
-  if (view.status === "awaiting_report") return { kind: "standby", caption: "Waiting for the caller's report" };
-  if (view.status === "awaiting_authorization") return { kind: "standby", caption: "Waiting for mission authorization" };
+  if (view.status === "awaiting_report") return { kind: "standby", caption: AWAITING_REPORT };
+  if (view.status === "awaiting_authorization") return { kind: "standby", caption: AWAITING_AUTHORIZATION };
   return rail === null ? { kind: "standby", caption: "" } : phaseScreen(rail);
 }
 
@@ -198,3 +205,38 @@ export function overlayText(spec: ScreenSpec): string {
   })();
   return text.slice(0, MAX_OVERLAY_CHARS);
 }
+
+/**
+ * Screens for image firmware (legacy v54), where each new image takes about 4.5 s to upload: the device shows a
+ * fixed vocabulary that is installed at connect, so nothing is uploaded while a decision is waiting.
+ * - A waiting decision shows its kind's template (no per-proposal target, coverage or countdown; the action card
+ *   carries those), shown within one image command of the proposal appearing.
+ * - Approved / rejected / standby / phase screens drop their per-run wording (commander, caption).
+ * The mirror in the app keeps the full screen.
+ */
+export function deviceSpec(spec: ScreenSpec): ScreenSpec {
+  switch (spec.kind) {
+    case "pending": return templateFor(spec.action);
+    case "approved":
+    case "rejected": return { kind: spec.kind, action: "breach_opening", title: "", by: "", viaConsole: false };
+    case "standby": return { kind: "standby", caption: "" };
+    case "phase": return { ...spec, caption: "" };
+    default: return spec;
+  }
+}
+
+export function templateFor(action: GateAction): ScreenSpec {
+  return { kind: "pending", action, title: TITLES[action], target: "", coverage: null, note: "", secondsLeft: 0, ring: 0, digestPrefix: "", armed: true, template: true };
+}
+
+/** What image firmware installs at connect, in order; verify marks the ones read back byte for byte. */
+export const DEVICE_PRELOAD: readonly { readonly spec: ScreenSpec; readonly verify: boolean }[] = [
+  ...(["breach_opening", "spray", "release_payload"] as const).map(action => ({ spec: templateFor(action), verify: true })),
+  ...[{ kind: "standby", caption: "" } as const, { kind: "approved", action: "breach_opening", title: "", by: "", viaConsole: false } as const,
+    { kind: "rejected", action: "breach_opening", title: "", by: "", viaConsole: false } as const, { kind: "aborted", caption: ABORTED_CAPTION } as const, { kind: "no_run" } as const]
+    .map(spec => ({ spec: spec as ScreenSpec, verify: false })),
+  ...PHASE_ORDER.map((phase, i) => ({
+    spec: { kind: "phase", phase, index: i + 1, label: PHASES[phase].label.toUpperCase(), caption: "", steps: PHASE_ORDER.map((_, j) => (j < i ? "done" : j === i ? "current" : "upcoming")), halt: null } as ScreenSpec,
+    verify: false,
+  })),
+];

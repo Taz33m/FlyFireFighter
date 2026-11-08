@@ -24,8 +24,10 @@ import type { DisplayedDigest } from "../approval.ts";
 import { noteDisplayed } from "../approval.ts";
 import type { Gesture } from "./buttons.ts";
 import { ButtonGestures } from "./buttons.ts";
-import type { ConsoleCommand, ConsoleMessage } from "./stock-protocol.ts";
-import { BUTTON_EVENT_INTERVAL_MS, ConsoleParser, encodeCommand } from "./stock-protocol.ts";
+import type { DeviceImage, LegacyHost } from "./legacy-driver.ts";
+import { LegacyDriver } from "./legacy-driver.ts";
+import type { ConsoleCommand, ConsoleMessage, LegacyCommand } from "./stock-protocol.ts";
+import { BUTTON_EVENT_INTERVAL_MS, ConsoleParser, encodeCommand, encodeLegacy } from "./stock-protocol.ts";
 
 /** Matches the official host libraries. USB CDC ignores the rate, except that 1200 means "reboot to bootloader". */
 export const CONSOLE_BAUD_RATE = 1_000_000;
@@ -54,9 +56,16 @@ export const SLOW_DISPLAY_INTERVAL_MS = 1000;
 export interface DeviceScreen {
   readonly text: string;
   readonly digest: string | null;
+  /** The full 320 × 240 screen as an .FWI, for legacy firmware that shows images (null when not rendered). */
+  readonly image?: DeviceImage | null;
 }
 
 const OGFW_MAIN = /^FWOG main ogfw (\d{3})$/;
+/** Legacy FREE-WILi firmware's display CPU, e.g. "DisplayCPU v54": full-screen images, LIFELINE-style. */
+const LEGACY_DISPLAY = /DisplayCPU\D*?(\d+)/i;
+const LEGACY_MAIN = /MainCPU/i;
+/** Raw upload chunks can take longer than a command line to drain. */
+const RAW_WRITE_TIMEOUT_MS = 10_000;
 
 export function assertSafeBaudRate(baudRate: number): number {
   if (!Number.isFinite(baudRate) || baudRate <= 2400 || baudRate === BOOTLOADER_BAUD_RATE) {
@@ -99,6 +108,10 @@ export interface ConsoleSnapshot {
   readonly device: DisplayedDigest | null;
   readonly abortPrimed: boolean;
   readonly detail: string | null;
+  /** "images" on legacy firmware that shows full screens, "text" for the one-line overlay; null until identified. */
+  readonly display: "text" | "images" | null;
+  /** Connect-time screen installation on image firmware, or null. */
+  readonly loading: { readonly done: number; readonly total: number } | null;
 }
 
 export interface SessionOptions {
@@ -143,6 +156,11 @@ export class ConsoleSession {
   private lastWriteMs = -Infinity;
   private desired: DeviceScreen | null = null;
   private displayIntervalMs = MIN_DISPLAY_INTERVAL_MS;
+  /** Set once identified: OG v024 MAIN (text line) or legacy v54 DISPLAY (images). */
+  private mode: "ogfw" | "legacy" | null = null;
+  private legacy: LegacyDriver | null = null;
+  private lastLevels: string | null = null;
+  private loading: { readonly done: number; readonly total: number } | null = null;
   private readonly transport: ConsoleTransport;
   private readonly options: SessionOptions;
 
@@ -153,7 +171,7 @@ export class ConsoleSession {
   }
 
   snapshot(): ConsoleSnapshot {
-    return { status: this.status, product: this.product, buttonsLive: this.buttonsLive, device: this.device, abortPrimed: this.gestures.abortPrimed(this.options.now()), detail: this.detail };
+    return { status: this.status, product: this.product, buttonsLive: this.buttonsLive, device: this.device, abortPrimed: this.gestures.abortPrimed(this.options.now()), detail: this.detail, display: this.displayMode(), loading: this.loading };
   }
 
   /** Open the port, start reading, and ask the port who it is. Nothing else is written until it answers. */
@@ -169,7 +187,11 @@ export class ConsoleSession {
   async close(): Promise<void> {
     if (this.closing) return;
     this.closing = true;
-    if (this.status === "connected") {
+    if (this.status === "connected" && this.mode === "legacy") {
+      this.sendLegacy({ kind: "button_events", intervalMs: 0 });
+      this.sendLegacy({ kind: "clear_text" });
+      this.sendLegacy({ kind: "reset" });
+    } else if (this.status === "connected") {
       this.send({ kind: "button_events", intervalMs: 0 });
       // Leave no proposal on the device once it no longer speaks for the commander.
       this.send({ kind: "clear_text" });
@@ -183,7 +205,19 @@ export class ConsoleSession {
   /** The screen the device should show now. */
   show(screen: DeviceScreen): void {
     this.desired = screen;
-    this.pump();
+    if (this.legacy !== null && this.status === "connected") this.legacy.want({ text: screen.text, digest: screen.digest, image: screen.image ?? null });
+    else this.pump();
+  }
+
+  /** Static screens to install ahead of need (legacy image firmware only). */
+  preload(images: readonly DeviceImage[]): void {
+    this.legacy?.preload(images);
+  }
+
+  /** Which display path this connection uses, once identified. */
+  displayMode(): "text" | "images" | null {
+    if (this.mode === null) return null;
+    return this.mode === "legacy" && this.legacy !== null && !this.legacy.imagesDisabled ? "images" : "text";
   }
 
   /** Call every ~50–100 ms: identify timeout, button polling, red-hold detection, display acknowledgement. */
@@ -196,6 +230,7 @@ export class ConsoleSession {
     if (this.status !== "connected") return;
     this.poll(now);
     for (const gesture of this.gestures.tick(now)) this.options.onGesture(gesture);
+    if (this.legacy !== null) { this.legacy.tick(); return; }
     if (this.inFlight !== null && now - this.inFlight.sentAtMs > DISPLAY_ACK_TIMEOUT_MS) {
       this.inFlight = null;
       this.device = null;
@@ -214,15 +249,18 @@ export class ConsoleSession {
   private poll(now: number): void {
     if (this.pollSentAtMs !== null && now - this.pollSentAtMs < POLL_TIMEOUT_MS) return;
     if (now - this.lastPollMs < POLL_MS) return;
+    if (this.legacy?.busy === true) return;
     this.pollSentAtMs = now;
     this.lastPollMs = now;
-    this.send({ kind: "read_buttons" });
+    if (this.mode === "legacy") this.sendLegacy({ kind: "read_buttons" });
+    else this.send({ kind: "read_buttons" });
   }
 
   private handle(message: ConsoleMessage): void {
     if (message.type === "line") return this.banner(message.banner);
     if (message.type === "identity") return this.identified(message.product);
     if (this.status !== "connected") return;
+    if (this.legacy !== null && this.legacy.handle(message)) return;
     if (message.type === "buttons") return this.levels(message);
     if (message.type === "response" && message.command === "g\\p") this.acknowledged(message.ok);
   }
@@ -236,18 +274,47 @@ export class ConsoleSession {
   private identified(product: string): void {
     if (this.status !== "waiting") return;
     this.product = product;
+    if (LEGACY_DISPLAY.test(product)) return this.startLegacy();
+    if (LEGACY_MAIN.test(product)) return this.refuse("wrong_port", `This is the legacy firmware's MAIN CPU ("${product}"). Choose the DisplayCPU port instead.`);
     const match = OGFW_MAIN.exec(product);
     if (match === null) return this.refuse("wrong_port", `This port answered "${product}", not the OG firmware's MAIN CPU.`);
     if (Number(match[1]) < MIN_OGFW_VERSION) return this.refuse("unsupported_firmware", `${product} predates host button reads (v023). Install the current FreeWili OG firmware.`);
+    this.mode = "ogfw";
     this.setStatus("connected", null);
     this.send({ kind: "button_events", intervalMs: BUTTON_EVENT_INTERVAL_MS });
     this.poll(this.options.now());
     this.pump();
   }
 
+  private startLegacy(): void {
+    this.mode = "legacy";
+    const host: LegacyHost = {
+      now: () => this.options.now(),
+      send: cmd => this.sendLegacy(cmd),
+      sendRaw: bytes => this.sendBytes(bytes, RAW_WRITE_TIMEOUT_MS),
+      expectRaw: (count, magic) => this.parser.expectRaw(count, magic),
+      onShown: (digest, ok) => {
+        this.device = ok && digest !== null ? noteDisplayed(this.device, digest, this.options.now()) : null;
+        if (!ok) this.detail = "The console display refused the last screen";
+        this.changed();
+      },
+      onStatus: detail => { this.detail = detail; this.changed(); },
+      onProgress: (done, total) => { this.loading = { done, total }; this.changed(); },
+    };
+    this.legacy = new LegacyDriver(host);
+    this.setStatus("connected", null);
+    this.sendLegacy({ kind: "button_events", intervalMs: BUTTON_EVENT_INTERVAL_MS });
+    this.poll(this.options.now());
+    if (this.desired !== null) this.show(this.desired);
+  }
+
   private levels(message: Extract<ConsoleMessage, { type: "buttons" }>): void {
     if (message.source === "poll") this.pollSentAtMs = null;
     if (!this.buttonsLive) { this.buttonsLive = true; this.changed(); }
+    // On legacy firmware a button press also drives its own GUI: redraw our screen after any edge.
+    const key = JSON.stringify(message.levels);
+    if (this.legacy !== null && this.lastLevels !== null && key !== this.lastLevels) this.legacy.resync();
+    this.lastLevels = key;
     // Responses and events share one sequence counter, so both are ordered by it.
     const gestures = this.gestures.update(message.levels, message.seq, this.options.now());
     for (const gesture of gestures) this.options.onGesture(gesture);
@@ -295,8 +362,17 @@ export class ConsoleSession {
 
   private send(command: ConsoleCommand): void {
     if (this.writesStopped) return;
-    const bytes = encodeCommand(command);
-    const timeoutMs = this.options.writeTimeoutMs ?? WRITE_TIMEOUT_MS;
+    this.sendBytes(encodeCommand(command));
+  }
+
+  private sendLegacy(command: LegacyCommand): void {
+    if (this.writesStopped) return;
+    this.sendBytes(encodeLegacy(command));
+  }
+
+  private sendBytes(bytes: Uint8Array, timeout?: number): void {
+    if (this.writesStopped) return;
+    const timeoutMs = timeout ?? this.options.writeTimeoutMs ?? WRITE_TIMEOUT_MS;
     this.writing = this.writing.then(async () => {
       if (this.writesStopped) return;
       const result = await withTimeout(this.transport.write(bytes).then(() => "ok" as const, () => "failed" as const), timeoutMs);
@@ -317,6 +393,7 @@ export class ConsoleSession {
 
   private lost(status: ConsoleStatus, detail: string | null): void {
     this.gestures.reset();
+    this.legacy = null;
     this.device = null;
     this.inFlight = null;
     this.desired = null;

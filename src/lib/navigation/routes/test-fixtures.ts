@@ -123,7 +123,7 @@ export function input(scene: Scene, lastInterventionTick: Tick | null = null, ti
     routes: [], dispatchConfirmed: null,
   };
   // The fixtures were written against a 30 s route evidence age; they test the mechanism, not the default value.
-  return { belief, tick, lastInterventionTick, policy: { ...DEFAULT_POLICY, routeEvidenceMaxAgeTicks: 3000 } };
+  return { belief, tick, lastInterventionTick, policy: { ...DEFAULT_POLICY, routeEvidenceMaxAgeTicks: 3000, routeSupportRelaxed: false } };
 }
 
 /** Every opening observed in its usual state (front and back doors closed, interior doors open, window broken). */

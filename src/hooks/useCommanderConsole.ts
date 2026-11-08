@@ -6,7 +6,8 @@ import { APPROVAL_ARMING_MS, noteDisplayed } from "@/components/mission/approval
 import type { Gesture } from "@/components/mission/console/buttons";
 import { decideGesture } from "@/components/mission/console/decide";
 import type { ScreenSpec } from "@/components/mission/console/screens";
-import { deriveScreen, overlayText, screenDigest } from "@/components/mission/console/screens";
+import { DEVICE_PRELOAD, deriveScreen, deviceSpec, overlayText, screenDigest } from "@/components/mission/console/screens";
+import { deviceImage } from "@/components/mission/console/device-image";
 import type { ConsoleSnapshot, DeviceScreen } from "@/components/mission/console/session";
 import { ConsoleSession } from "@/components/mission/console/session";
 import { requestConsolePort, webSerial, webSerialTransport } from "@/components/mission/console/web-serial";
@@ -88,11 +89,34 @@ export function useCommanderConsole({ state, send, commanderId, rail }: Options)
   const shownDigest = screenDigest(spec, state.view);
   const device = useMemo<DeviceScreen>(() => ({ text, digest: shownDigest }), [text, shownDigest]);
 
+  const imagesOn = snapshot?.display === "images";
   const screenRef = useRef(device);
   useEffect(() => {
     screenRef.current = device;
-    session.current?.show(device);
-  }, [device]);
+    // On image firmware the image effect below shows the screen, so the text never flashes in between.
+    if (!imagesOn) session.current?.show(device);
+  }, [device, imagesOn]);
+
+  // Legacy firmware shows full screens from a fixed set installed at connect (deviceSpec): a waiting decision shows
+  // its kind's template at once; the session shows text only until a screen's image is installed.
+  const imageSpecKey = JSON.stringify(deviceSpec(spec));
+  useEffect(() => {
+    if (!imagesOn) return;
+    let live = true;
+    const target = JSON.parse(imageSpecKey) as ScreenSpec;
+    deviceImage(target).then(
+      image => { if (live) session.current?.show({ ...screenRef.current, image: { ...image, verify: target.kind === "pending" } }); },
+      () => { if (live) session.current?.show(screenRef.current); },
+    );
+    return () => { live = false; };
+  }, [imagesOn, imageSpecKey, device]);
+
+  // At connect, install the screen set in priority order: decision templates (read back), then the rest.
+  useEffect(() => {
+    if (!imagesOn) return;
+    void Promise.all(DEVICE_PRELOAD.map(async ({ spec: s, verify }) => ({ ...(await deviceImage(s)), verify, priority: verify ? 0 : 2 })))
+      .then(images => session.current?.preload(images), () => {});
+  }, [imagesOn]);
 
   useEffect(() => {
     if (note === null) return;

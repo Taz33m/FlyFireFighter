@@ -4,7 +4,7 @@ import { TENDER_T1 } from "../../contracts/aircraft.ts";
 import type { BeliefSnapshot, FloorPlanPrior, OccupantTrack } from "../../contracts/evidence.ts";
 import { vec3 } from "../../contracts/frames.ts";
 import { DEFAULT_POLICY } from "../../harness/policy.ts";
-import { buildCandidateSet } from "./candidates.ts";
+import { buildCandidateSet, isWindowLook } from "./candidates.ts";
 import type { LocalPlan } from "./local-planner.ts";
 import { PLANNER_WEIGHTS, rankCandidates } from "./local-planner.ts";
 import { afterSuppressionBelief, closedWindowBelief, ENVELOPE, HOUSE, insideBelief, openingSeen, outsideBelief, REPORT, shuffled, T_OUTSIDE, TRACK } from "./test-fixtures.ts";
@@ -18,20 +18,30 @@ function plan(belief: BeliefSnapshot, lastInterventionTick: number | null = null
   return rankCandidates(build(belief, lastInterventionTick), belief, DEFAULT_POLICY);
 }
 
+/**
+ * DEMO: with no breach on offer, a look at the best-placed window (it ends on that window's breach standoff) now ranks
+ * above every room inspection, so the drone goes straight to the entry. The tests of how inspections rank among
+ * themselves (report weight, superseded reports, re-inspection loops) leave those looks out.
+ */
+function planInspections(belief: BeliefSnapshot) {
+  const set = build(belief);
+  return rankCandidates({ ...set, candidates: set.candidates.filter(c => !isWindowLook(c)) }, belief, DEFAULT_POLICY);
+}
+
 /** North of the house: the front bedroom's exterior viewpoint is 2 m away, the rear bedroom's 14 m. */
 const northPose = { ...outsideBelief().pose, position: vec3(2.5, 12, 4.4) };
 
 describe("local planner", () => {
   test("prefers the room named in a report over a nearer unreported room", () => {
-    const withReport = plan(outsideBelief({ pose: northPose }));
+    const withReport = planInspections(outsideBelief({ pose: northPose }));
     assert.equal(withReport.choiceId, "inspect_room:bedroom-rear");
-    const withoutReport = plan(outsideBelief({ pose: northPose, reports: [] }));
+    const withoutReport = planInspections(outsideBelief({ pose: northPose, reports: [] }));
     assert.equal(withoutReport.choiceId, "inspect_room:bedroom-front", "without the report the nearer room wins");
   });
 
   test("a superseded report no longer directs the search", () => {
     const correction = { ...REPORT, id: "report-2", receivedTick: 950, originalText: "Sorry, the front bedroom.", roomHint: "bedroom-front", supersedes: "report-1" };
-    const result = plan(outsideBelief({ reports: [REPORT, correction] }));
+    const result = planInspections(outsideBelief({ reports: [REPORT, correction] }));
     assert.equal(result.choiceId, "inspect_room:bedroom-front");
   });
 
@@ -58,7 +68,11 @@ describe("local planner", () => {
 
   test("a window observed closed ranks breaching above re-inspecting the room through it", () => {
     const result = plan(closedWindowBelief());
-    assert.equal(result.choiceId, "request_breach:window-rear");
+    const ids = result.ranked.map(r => r.id);
+    assert.ok(ids.indexOf("request_breach:window-rear") < ids.indexOf("inspect_room:bedroom-rear"), ids.join(", "));
+    // DEMO: the report names the rear bedroom, so its window ranks like an occupied room's (glass kept out while another
+    // entry serves): the first choice is a look at the front window, whose door leads on to the rear bedroom.
+    assert.equal(result.choiceId, "inspect_room:bedroom-front:window-front");
   });
 
   test("an observed open entry ranks entering above breaking glass", () => {
@@ -74,10 +88,10 @@ describe("local planner", () => {
     const justSeen = outsideBelief({
       coverage: closedWindowBelief().coverage,
     });
-    const result = plan(justSeen);
+    const result = planInspections(justSeen);
     assert.notEqual(result.choiceId, "inspect_room:bedroom-rear");
     const later = outsideBelief({ tick: T_OUTSIDE + 1200, coverage: closedWindowBelief().coverage });
-    assert.equal(plan(later).choiceId, "inspect_room:bedroom-rear", "the report regains weight once the view is stale");
+    assert.equal(planInspections(later).choiceId, "inspect_room:bedroom-rear", "the report regains weight once the view is stale");
   });
 
   test("suppressing a fire on a blocked evacuation route outranks a second look at the lead", () => {
@@ -87,9 +101,15 @@ describe("local planner", () => {
     assert.ok(spray?.score && spray.score.adjustment > 0, "rescue relevance is part of the score");
   });
 
-  test("guidance along a fresh supported route ranks first once it exists", () => {
-    const result = plan(afterSuppressionBelief(), 2100);
+  test("guidance along a fresh supported route ranks first once it exists (aircraft clear of the way out)", () => {
+    const base = afterSuppressionBelief();
+    const result = plan(afterSuppressionBelief({}, { pose: { ...base.pose, position: vec3(2.5, 6.5, 4.3) } }), 2100);
     assert.equal(result.choiceId, "guide_to_exit:track-1:route-evac");
+  });
+
+  test("DEMO: on the way out, standing clear ranks first and guidance waits", () => {
+    const result = plan(afterSuppressionBelief(), 2100);
+    assert.match(result.choiceId, /^investigate_signal:track-1:stand-clear$/);
   });
 
   test("with no supported proposal the planner defers", () => {
@@ -133,7 +153,9 @@ describe("local planner: choosing a window to breach (fixture house)", () => {
 
   test("a possible occupant in the reported room moves the breach to a connected neighbour; without one the reported room is preferred", () => {
     const report = { reports: [REPORT], pose: outsideBelief().pose };
-    assert.equal(rankedBreaches(plan(bothClosed(HOUSE, report)))[0], "request_breach:window-rear");
+    // DEMO: a room a report names now ranks like an occupied one for glass, so the connected neighbour is preferred even
+    // before anyone is seen there (it was the reported room; its window's debris would reach the person once seen).
+    assert.deepEqual(rankedBreaches(plan(bothClosed(HOUSE, report))), ["request_breach:window-front", "request_breach:window-rear"]);
     // In the rear bedroom but clear of the window's debris region: the window is offered, and ranked down.
     const occupant: OccupantTrack = { ...TRACK, position: vec3(0.3, 0.5, 3.5), uncertaintyM: 0.1, observationIds: [] };
     const result = plan(bothClosed(HOUSE, { ...report, tracks: [occupant] }));
@@ -149,13 +171,17 @@ describe("local planner: choosing a window to breach (fixture house)", () => {
 
   test("size-up: a look at a better-placed unobserved window ranks above the nearer observed breach", () => {
     const front = openingSeen("window-front", "closed", T_OUTSIDE - 10, "obs-front");
-    const belief = outsideBelief({ pose: { ...outsideBelief().pose, position: vec3(2.5, 12, 4.4) }, observations: [front.observation], openings: [front.evidence] });
+    // DEMO: the report's room now ranks like an occupied one for glass (see above), so the rear window is made the better
+    // placed one by access instead: no report, and the front bedroom's door drawn closed (entering there would strand it).
+    const belief = outsideBelief({ mapPrior: doorClosed, reports: [], pose: { ...outsideBelief().pose, position: vec3(2.5, 12, 4.4) }, observations: [front.observation], openings: [front.evidence] });
     const result = plan(belief);
     assert.equal(result.choiceId, "inspect_room:bedroom-rear:window-rear");
     const look = result.ranked.find(r => r.id === result.choiceId)?.score;
     const breach = result.ranked.find(r => r.id === "request_breach:window-front")?.score;
     assert.ok(look && breach);
-    assert.equal(look.total, round(breach.total + PLANNER_WEIGHTS.sizeUpLead), "lifted just above the breach it might replace");
+    // DEMO: in this fixture the front breach is also ranked down (closed in), so the look may already score above it without
+    // the lift; either way it ends at least sizeUpLead above the breach it might replace.
+    assert.ok(look.total >= round(breach.total + PLANNER_WEIGHTS.sizeUpLead), "at least sizeUpLead above the breach it might replace");
     assert.equal(look.total, round(look.base + look.report + look.newObservation + look.evidenceAge + look.adjustment - look.travel), "the lift is part of the adjustment");
     // Once the rear window is observed closed, its breach wins and the look is gone.
     const rear = openingSeen("window-rear", "closed", T_OUTSIDE - 5, "obs-rear");

@@ -15,15 +15,17 @@ function endedLine(c: ConsoleState): { readonly text: string; readonly tone: Ton
 function openLine(snap: ConsoleState["snapshot"]): { readonly text: string; readonly tone: Tone } {
   if (snap === null || snap.status === "connecting" || snap.status === "waiting") return { text: "Port open; asking the device who it is…", tone: "muted" };
   if (snap.status !== "connected") return { text: snap.detail ?? "The console cannot be used.", tone: "warn" };
+  if (snap.loading !== null && snap.loading.done < snap.loading.total) return { text: `Loading console screens ${snap.loading.done}/${snap.loading.total} (about 5 s each; buttons work meanwhile)…`, tone: "muted" };
   if (!snap.buttonsLive) return { text: "Connected; waiting for button events…", tone: "muted" };
   if (snap.abortPrimed) return { text: "Press red again (or keep holding) to abort the mission.", tone: "warn" };
-  return { text: `Connected (${snap.product ?? "FWOG main"}): GREEN approve, YELLOW reject, RED twice or hold 1 s to abort.`, tone: "ok" };
+  const screens = snap.display === "images" ? ", full screens" : ", text line";
+  return { text: `Connected (${snap.product ?? "FWOG main"}${screens}): GREEN approve, YELLOW reject, RED twice or hold 1 s to abort.`, tone: "ok" };
 }
 
 function statusLine(c: ConsoleState): { readonly text: string; readonly tone: Tone } {
   if (!c.supported) return { text: "Web Serial is not available in this browser (use Chrome or Edge). The on-screen controls work as usual.", tone: "muted" };
   if (c.phase === "idle") return { text: "Not connected. The on-screen controls and keyboard work as usual.", tone: "muted" };
-  if (c.phase === "choosing") return { text: "Choose the FWOG main port named \"Board CDC\" in the browser dialog…", tone: "muted" };
+  if (c.phase === "choosing") return { text: "Choose the Free-WiLi port in the browser dialog (DisplayCPU on legacy firmware, \"Board CDC\" on OG v024)…", tone: "muted" };
   return c.phase === "ended" ? endedLine(c) : openLine(c.snapshot);
 }
 

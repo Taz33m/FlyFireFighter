@@ -73,14 +73,17 @@ describe("compartment smoke transport", () => {
 describe("dose-limited suppression", () => {
   const nozzle = vec3(1.2, 3, 1.0);
 
+  /** A dose that knocks the small fire down without putting it out, whatever the (demo-tuned) suppression rate. */
+  const PARTIAL_L = 20 / FIRE_MODEL.suppressionKWPerL;
+
   test("water reduces heat release only when the jet reaches the fire region, by the documented dose rule", () => {
     const world = fixtureWorld({ fire: SMALL_FIRE, openings: { "door-ab": "open" } });
     const before = world.fires[0].heatReleaseKW;
     const missed = deliverWater(world, sector(nozzle, vec3(-1, 0, 0), (8 * Math.PI) / 180, 4), 0.1, 0);
     assert.equal(missed, 0);
     assert.equal(world.fires[0].heatReleaseKW, before);
-    const reached = deliverWater(world, jetAt(nozzle, FIRE_ORIGIN), 0.1, 1);
-    assert.ok(reached > 0.05 && reached <= 0.1, `reached ${reached} L`);
+    const reached = deliverWater(world, jetAt(nozzle, FIRE_ORIGIN), PARTIAL_L, 1);
+    assert.ok(reached > PARTIAL_L / 2 && reached <= PARTIAL_L, `reached ${reached} L`);
     assert.ok(Math.abs(world.fires[0].heatReleaseKW - (before - FIRE_MODEL.suppressionKWPerL * reached)) < 1e-9);
     assert.equal(world.fires[0].waterDeliveredL, reached);
   });
@@ -96,7 +99,7 @@ describe("dose-limited suppression", () => {
 
   test("a partial dose leaves a fire that regrows; a sufficient dose extinguishes it for good", () => {
     const world = fixtureWorld({ fire: SMALL_FIRE, openings: { "door-ab": "open" } });
-    deliverWater(world, jetAt(nozzle, FIRE_ORIGIN), 0.1, 0);
+    deliverWater(world, jetAt(nozzle, FIRE_ORIGIN), PARTIAL_L, 0);
     const knockedDown = world.fires[0].heatReleaseKW;
     assert.ok(knockedDown > FIRE_MODEL.extinguishBelowKW && !world.fires[0].extinguished);
     run(world, 20);
@@ -105,7 +108,7 @@ describe("dose-limited suppression", () => {
     const startKW = world.fires[0].heatReleaseKW;
     let tick = 100;
     let totalReached = 0;
-    while (!world.fires[0].extinguished && tick < 200) totalReached += deliverWater(world, jetAt(nozzle, FIRE_ORIGIN), 0.02, tick++);
+    while (!world.fires[0].extinguished && tick < 200) totalReached += deliverWater(world, jetAt(nozzle, FIRE_ORIGIN), PARTIAL_L / 5, tick++);
     assert.equal(world.fires[0].extinguished, true);
     assert.equal(world.fires[0].heatReleaseKW, 0);
     assert.ok(totalReached >= (startKW - FIRE_MODEL.extinguishBelowKW) / FIRE_MODEL.suppressionKWPerL - 1e-9);

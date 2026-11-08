@@ -113,6 +113,19 @@ export interface CommandConfig {
   readonly contactPushBandM: number;
   /** Largest backward speed: no range reading covers the rear. */
   readonly blindSpeedMps: number;
+  /**
+   * A forward range return at least this far (or none while the side sectors return) makes the space ahead
+   * known for the base speed, as accumulated looming evidence does: cruise instead of exploration speed.
+   */
+  readonly rangeKnownM: number;
+  /**
+   * Goal approach speed falls with the goal bearing as max(0, cos)^this: 1 nearly stops to turn toward a goal
+   * 60° off the nose (half speed); 0.5 keeps 71% there and turns while moving. A goal abeam or behind is still
+   * turned toward in place.
+   */
+  readonly turnSpeedExponent: number;
+  /** Speed scale at zero pose reliability (1 at full reliability): poseScale = min + (1 − min) × reliability. */
+  readonly minPoseSpeedScale: number;
 }
 
 export const DEFAULT_COMMAND_CONFIG: CommandConfig = Object.freeze({
@@ -123,6 +136,7 @@ export const DEFAULT_COMMAND_CONFIG: CommandConfig = Object.freeze({
   minVisualConfidence: 0.15, fullVisualConfidence: 0.6, poseSigmaOkM: 0.3, poseSigmaMaxM: 1.5,
   rangeClearanceM: 0.6, rangeBrakeTimeS: 1.0, rangeTurnRateRadps: 0.6, rangeTurnHysteresisM: 0.3, lateralClearanceM: 0.6, lateralGain: 1.5,
   rangeOnlySpeedMps: 0.4, minHeightM: 0.5, contactClearanceM: 0.32, contactPushBandM: 0.05, blindSpeedMps: 0.15,
+  rangeKnownM: Infinity, turnSpeedExponent: 1, minPoseSpeedScale: 0.4,
 });
 
 export interface CommandResult {
@@ -164,6 +178,12 @@ function sanitizeRanges(ranges: RangeAssist | null): Ranges | null {
 /** The forward sector has no return while a lateral sector has one: the range sensor is working and sees nothing ahead within its range. */
 function lidarClearAhead(r: Ranges | null): boolean {
   return r !== null && r.forward === null && (r.left !== null || r.right !== null);
+}
+
+/** The range sensor makes the space ahead known: a forward return at least rangeKnownM away, or none ahead while the sides return. */
+function rangeKnownAhead(c: CommandConfig, r: Ranges | null): boolean {
+  if (r === null || !Number.isFinite(c.rangeKnownM)) return false;
+  return r.forward === null ? lidarClearAhead(r) : r.forward >= c.rangeKnownM;
 }
 
 function sanitizeGoal(goal: GoalEstimate | null): GoalEstimate | null {
@@ -284,7 +304,7 @@ export class ReflexCommandMapper {
     const c = this.config;
     const free = this.freeDistanceM;
     const forwardRange = s.ranges?.forward ?? null;
-    const aheadKnown = this.freeDistanceKnown && cues !== null && cues.loomingRateHz !== null;
+    const aheadKnown = (this.freeDistanceKnown && cues !== null && cues.loomingRateHz !== null) || rangeKnownAhead(c, s.ranges);
     const limits = this.speedLimits(free, aheadKnown, { forward: forwardRange, clearAhead: lidarClearAhead(s.ranges) }, s.visionScale, s.poseReliability);
     const ceiling = limits.ceiling;
     const blocked = 1 - smoothstep(free, c.stopDistanceM, c.stopDistanceM + 1.5);
@@ -351,7 +371,7 @@ export class ReflexCommandMapper {
     const vision = Math.max(base * visionScale, forwardRange !== null || ahead.clearAhead ? c.rangeOnlySpeedMps : 0);
     const looming = Math.max(0, (free - c.stopDistanceM) / c.brakeTimeS);
     const range = forwardRange === null ? Infinity : Math.max(0, (forwardRange - c.rangeClearanceM) / c.rangeBrakeTimeS);
-    const poseScale = 0.4 + 0.6 * poseReliability;
+    const poseScale = c.minPoseSpeedScale + (1 - c.minPoseSpeedScale) * poseReliability;
     return { vision, looming, range, poseScale, ceiling: Math.min(vision, looming, range) * poseScale, visionScale };
   }
 
@@ -359,7 +379,7 @@ export class ReflexCommandMapper {
   private desiredSpeed(goal: GoalEstimate | null): number {
     const c = this.config;
     if (goal === null || goal.distanceM <= c.arrivalRadiusM) return 0;
-    return Math.min(c.approachGain * goal.distanceM, c.cruiseSpeedMps) * Math.max(0, Math.cos(goal.bearingRad));
+    return Math.min(c.approachGain * goal.distanceM, c.cruiseSpeedMps) * Math.max(0, Math.cos(goal.bearingRad)) ** c.turnSpeedExponent;
   }
 
   private steering(cues: ReflexCues | null, goal: GoalEstimate | null, visionScale: number, blocked: number, poseReliability: number): { goal: number; center: number; avoid: number } {

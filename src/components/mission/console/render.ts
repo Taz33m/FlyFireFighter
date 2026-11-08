@@ -263,11 +263,18 @@ function drawPending(ctx: Ctx, s: Extract<ScreenSpec, { kind: "pending" }>): voi
   actionIcon(ctx, s.action, 40, 82);
   const title = fitTitle(ctx, s.title, TITLE_MAX_W);
   title.lines.forEach((line, i) => text(ctx, line, 74, title.lines.length === 1 ? 74 : 64 + i * (title.size + 2), { size: title.size, color: C.ink, weight: 800, max: TITLE_MAX_W }));
-  text(ctx, s.target, 74, title.lines.length === 1 ? 96 : 104, { size: 12, color: C.muted, weight: 500, max: TITLE_MAX_W });
-  countdownRing(ctx, 280, 82, s.ring, s.secondsLeft);
-  coverageBar(ctx, s.coverage, 126);
-  text(ctx, s.note, 12, 166, { size: 12, color: C.ink, weight: 500, max: 296 });
-  text(ctx, `#${s.digestPrefix} · this approval binds to it`, 12, 188, { size: 9, color: C.muted, weight: 500, family: MONO, max: 296 });
+  text(ctx, s.template === true ? "Decision waiting" : s.target, 74, title.lines.length === 1 ? 96 : 104, { size: 12, color: C.muted, weight: 500, max: TITLE_MAX_W });
+  if (s.template === true) {
+    // The device template: per-proposal facts live on the action card, which the approval binds to.
+    text(ctx, "Target, coverage, window and digest:", 12, 140, { size: 12, color: C.ink, weight: 500, max: 296 });
+    text(ctx, "see the action card on the command screen.", 12, 158, { size: 12, color: C.ink, weight: 500, max: 296 });
+    text(ctx, "Approve arms after the review delay.", 12, 184, { size: 10, color: C.muted, weight: 500, max: 296 });
+  } else {
+    countdownRing(ctx, 280, 82, s.ring, s.secondsLeft);
+    coverageBar(ctx, s.coverage, 126);
+    text(ctx, s.note, 12, 166, { size: 12, color: C.ink, weight: 500, max: 296 });
+    text(ctx, `#${s.digestPrefix} · this approval binds to it`, 12, 188, { size: 9, color: C.muted, weight: 500, family: MONO, max: 296 });
+  }
   chips(ctx, [
     { column: 1, label: "✕ REJECT", fill: C.raised, ink: C.ink, border: C.muted, tick: C.button.yellow },
     s.armed ? { column: 2, label: "✓ APPROVE", fill: C.ember, ink: C.emberInk, tick: C.button.green } : { column: 2, label: "HOLD…", fill: C.raised, ink: C.muted, tick: C.button.green, dim: true },
@@ -328,8 +335,12 @@ function drawDecision(ctx: Ctx, s: Extract<ScreenSpec, { kind: "approved" | "rej
     ctx.lineCap = "butt";
   });
   text(ctx, approved ? "APPROVED" : "REJECTED", 160, 144, { size: 26, color: approved ? C.light : C.alert, weight: 800, align: "center", spacing: 1 });
-  text(ctx, `${s.title} · by ${s.by.replace(/ \(Free-WiLi console\)$/, "")}`, 160, 170, { size: 12, color: C.ink, weight: 500, align: "center", max: 296 });
-  text(ctx, s.viaConsole ? "via Free-WiLi console" : "via command screen", 160, 188, { size: 11, color: C.muted, weight: 500, align: "center" });
+  if (s.title === "") {
+    text(ctx, approved ? "The harness executes and monitors it" : "Nothing is executed", 160, 170, { size: 12, color: C.ink, weight: 500, align: "center", max: 296 });
+  } else {
+    text(ctx, `${s.title} · by ${s.by.replace(/ \(Free-WiLi console\)$/, "")}`, 160, 170, { size: 12, color: C.ink, weight: 500, align: "center", max: 296 });
+    text(ctx, s.viaConsole ? "via Free-WiLi console" : "via command screen", 160, 188, { size: 11, color: C.muted, weight: 500, align: "center" });
+  }
   chips(ctx, [ABORT_CHIP]);
 }
 

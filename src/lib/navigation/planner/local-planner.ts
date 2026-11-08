@@ -137,7 +137,8 @@ function sizeUpLift(set: CandidateSet, scored: readonly ScoredProposal[]): Score
     const access = candidate === undefined ? null : breachAccessOf(candidate);
     return access === null ? [] : [breachAccessScore(access)];
   });
-  if (breaches.length === 0 || breachAccess.length === 0) return [...scored];
+  if (breaches.length === 0) return looksBeforeInspections(byId, scored);
+  if (breachAccess.length === 0) return [...scored];
   const bestAccess = Math.max(...breachAccess);
   const looks = new Set(scored.filter(entry => {
     const candidate = byId.get(entry.id);
@@ -147,6 +148,25 @@ function sizeUpLift(set: CandidateSet, scored: readonly ScoredProposal[]): Score
   const bestBreach = Math.max(...breaches.map(entry => entry.score.total));
   const lowestLook = Math.min(...scored.filter(entry => looks.has(entry.id)).map(entry => entry.score.total));
   const lift = Math.max(0, bestBreach + W.sizeUpLead - lowestLook);
+  if (lift === 0) return [...scored];
+  return scored.map(entry => (looks.has(entry.id) ? { ...entry, score: { ...entry.score, adjustment: round6(entry.score.adjustment + lift), total: round6(entry.score.total + lift) } } : entry));
+}
+
+/**
+ * Demo: with no breach on offer yet, a look at a window worth breaking (positive unconfirmed access; it ends on the
+ * window's breach standoff) ranks PLANNER_WEIGHTS.sizeUpLead above every room inspection, so the first move goes
+ * straight to the entry window instead of inspecting rooms from outside first.
+ */
+function looksBeforeInspections(byId: ReadonlyMap<string, MissionCandidate>, scored: readonly ScoredProposal[]): ScoredProposal[] {
+  const looks = new Set(scored.filter(entry => {
+    const candidate = byId.get(entry.id);
+    return candidate !== undefined && isWindowLook(candidate) && candidate.target !== null && candidate.target.access !== null && unconfirmedAccessScore(candidate.target.access) > 0;
+  }).map(entry => entry.id));
+  const inspections = scored.filter(entry => entry.tool === "inspect_room" && !looks.has(entry.id));
+  if (looks.size === 0 || inspections.length === 0) return [...scored];
+  const bestInspection = Math.max(...inspections.map(entry => entry.score.total));
+  const lowestLook = Math.min(...scored.filter(entry => looks.has(entry.id)).map(entry => entry.score.total));
+  const lift = Math.max(0, bestInspection + W.sizeUpLead - lowestLook);
   if (lift === 0) return [...scored];
   return scored.map(entry => (looks.has(entry.id) ? { ...entry, score: { ...entry.score, adjustment: round6(entry.score.adjustment + lift), total: round6(entry.score.total + lift) } } : entry));
 }

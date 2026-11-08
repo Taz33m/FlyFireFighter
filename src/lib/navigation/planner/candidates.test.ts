@@ -4,14 +4,16 @@ import type { SensorSpec } from "../../contracts/aircraft.ts";
 import { SCOUT_S1, TENDER_T1 } from "../../contracts/aircraft.ts";
 import { TICK_S } from "../../contracts/clock.ts";
 import type { BeliefSnapshot, FloorPlanPrior, HazardEvidence, OccupantTrack } from "../../contracts/evidence.ts";
+import type { Vec3 } from "../../contracts/frames.ts";
 import { distance, vec3 } from "../../contracts/frames.ts";
 import { distanceToRegion, pointInPolygon, sphere } from "../../contracts/geometry.ts";
 import { parseProposalInput } from "../../contracts/schema.ts";
 import { affectedRegion } from "../../harness/effects.ts";
 import { DEFAULT_POLICY, riskClassOf } from "../../harness/policy.ts";
+import { guideLeadIndex } from "../../harness/person-clearance.ts";
 import type { CandidateFactoryInput } from "./candidates.ts";
 import { breachAccessScore, unconfirmedAccessScore } from "./access-score.ts";
-import { breachAccessOf, buildCandidateSet, isWindowLook, nextSweepStep } from "./candidates.ts";
+import { breachAccessOf, buildCandidateSet, isStandClear, isWindowLook, nextSweepStep } from "./candidates.ts";
 import {
   afterSuppressionBelief,
   closedWindowBelief,
@@ -30,6 +32,15 @@ import {
 } from "./test-fixtures.ts";
 import type { BreachAccess, CandidateSet, MissionTool, ProposalCandidate } from "./types.ts";
 import { CANDIDATE_ID_PATTERN, MAX_CANDIDATE_ID_LENGTH, MAX_DESCRIPTION_LENGTH } from "./types.ts";
+
+/** Horizontal distance from p to the segment a–b. */
+function segmentDistance2(a: Vec3, b: Vec3, p: Vec3): number {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const lengthSq = dx * dx + dy * dy;
+  const t = lengthSq === 0 ? 0 : Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / lengthSq));
+  return Math.hypot(p.x - (a.x + dx * t), p.y - (a.y + dy * t));
+}
 
 function build(belief: BeliefSnapshot, extra: Partial<CandidateFactoryInput> = {}): CandidateSet {
   return buildCandidateSet({ belief, profile: TENDER_T1, envelope: ENVELOPE, policy: DEFAULT_POLICY, ...extra });
@@ -381,7 +392,10 @@ describe("size-up looks at unobserved windows", () => {
     assert.equal(look.id, "inspect_room:bedroom-rear:window-rear");
     const pane = HOUSE.openings[1].center;
     assert.deepEqual(look.target.focus, pane, "it faces the pane");
-    assert.ok(Math.abs(distance(look.target.station ?? pane, pane) - 2) < 1e-6 && look.target.station?.z === pane.z, "2 m in front of it, at its height");
+    // DEMO: the look is taken from the window's breach standoff (0.6 × the 1.2 m striker reach), not 2 m out: arriving there
+    // is the look, and the breach is proposed from where the aircraft already is.
+    const reachM = (TENDER_T1.modules.glassBreaker?.reachM ?? 0) * 0.6;
+    assert.ok(Math.abs(distance(look.target.station ?? pane, pane) - reachM) < 1e-3 && look.target.station?.z === pane.z, "on the breach standoff, at the pane's height");
     assert.equal(look.proposal.action.kind, "move");
     assert.match(look.proposal.rationale, /^Look at window-rear before choosing where to break in: it opens into a room connected toward the target/);
     assert.match(look.description, /Observation only/);
@@ -400,7 +414,9 @@ describe("size-up looks at unobserved windows", () => {
     const set = build(seenClosed(["window-rear"]));
     assert.deepEqual(looks(set), []);
     assert.ok(!set.notes.some(note => /Size-up/.test(note)));
-    assert.deepEqual(looks(build(outsideBelief({ mapPrior: doorClosed }))), [], "without any breach on offer there is no size-up");
+    // DEMO: with no breach on offer yet the first move is a look at the best-placed window (it ends on that window's breach
+    // standoff), so the drone goes straight to the entry instead of inspecting rooms from outside first.
+    assert.ok(looks(build(outsideBelief({ mapPrior: doorClosed }))).length > 0, "without any breach on offer the best window gets a look");
   });
 
   test("a cooled look is not offered, and a cooled breach is no reason to skip one", () => {
@@ -408,8 +424,10 @@ describe("size-up looks at unobserved windows", () => {
     assert.deepEqual(looks(build(belief, { omitCandidateIds: ["inspect_room:bedroom-rear:window-rear"] })).filter(c => c.target.openingId === "window-rear"), []);
     // The only observed window cooling after a refusal: the size-up still looks for another way in, but only
     // at a window that promises access (the front bedroom with its door open, not the closed-in kitchen).
+    // DEMO: the report names the rear bedroom, so its window now ranks like an occupied room's (glass kept out while another
+    // entry serves) and the front window, with its door open, is worth a look even while the rear breach is on offer.
     const rearSeen = seenClosed(["window-rear"], HOUSE);
-    assert.deepEqual(looks(build(rearSeen)), []);
+    assert.deepEqual(looks(build(rearSeen)).map(c => c.id), ["inspect_room:bedroom-front:window-front"]);
     const cooled = build(rearSeen, { omitCandidateIds: ["request_breach:window-rear"] });
     assert.deepEqual(looks(cooled).map(c => c.id), ["inspect_room:bedroom-front:window-front"], cooled.notes.join("\n"));
     assert.ok(cooled.notes.some(note => /every observed window is cooling after a refusal/.test(note)));
@@ -672,8 +690,14 @@ describe("request_suppression standoff", () => {
 describe("guide_to_exit and return_to_base", () => {
   const guide = (set: CandidateSet) => proposals(set, "guide_to_exit");
 
+  /** The aircraft in the front bedroom, more than 4 m from the guided person's way out. */
+  const clearOfTheWay = (routeOverrides = {}, overrides: Partial<BeliefSnapshot> = {}) => {
+    const base = afterSuppressionBelief(routeOverrides, overrides);
+    return afterSuppressionBelief(routeOverrides, { ...overrides, pose: { ...base.pose, position: vec3(2.5, 6.5, 4.3) } });
+  };
+
   test("guides only along a fresh, supported evacuation route assessed after the intervention", () => {
-    const [candidate] = guide(build(afterSuppressionBelief(), { lastInterventionTick: 2100 }));
+    const [candidate] = guide(build(clearOfTheWay(), { lastInterventionTick: 2100 }));
     assert.ok(candidate && candidate.proposal.action.kind === "guide");
     assert.equal(candidate.proposal.action.routeId, "route-evac");
     assert.equal(candidate.proposal.action.trackId, TRACK.id);
@@ -686,6 +710,24 @@ describe("guide_to_exit and return_to_base", () => {
     assert.deepEqual(guide(build(afterSuppressionBelief({ assessedTick: 2200 - DEFAULT_POLICY.routeFreshTicks - 1 }))), [], "stale assessment");
     assert.deepEqual(guide(build(afterSuppressionBelief({ assessedTick: 2050 }), { lastInterventionTick: 2100 })), [], "assessed before the suppression");
     assert.deepEqual(guide(build(afterSuppressionBelief({}, { tracks: [] }), { lastInterventionTick: 2100 })), [], "no one to guide");
+  });
+
+  test("DEMO: with the aircraft on the person's way out, it first moves off it; guidance is offered once it is clear", () => {
+    const onTheWay = build(afterSuppressionBelief(), { lastInterventionTick: 2100 });
+    assert.deepEqual(guide(onTheWay), [], "no guidance while the aircraft is 0.5 m from the route");
+    const clear = onTheWay.candidates.find((c): c is ProposalCandidate => c.proposal !== null && isStandClear(c));
+    assert.ok(clear, onTheWay.notes.join("\n"));
+    assert.equal(clear.proposal.action.kind, "move");
+    const station = clear.target.station;
+    assert.ok(station !== null);
+    const route = afterSuppressionBelief().routes.find(r => r.purpose === "evacuation" && r.status === "supported");
+    assert.ok(route);
+    const belief = afterSuppressionBelief();
+    const lead = guideLeadIndex(route.waypoints, TRACK, { tick: belief.tick, missionStartTick: 0, profile: TENDER_T1, policy: DEFAULT_POLICY, envelope: ENVELOPE, belief });
+    const way = [TRACK.position, ...route.waypoints.slice(lead)];
+    const off = Math.min(...way.slice(1).map((b, i) => segmentDistance2(way[i], b, station)));
+    assert.ok(off >= 1.8 - 1e-9, `station ${off.toFixed(2)} m from the way out`);
+    assert.equal(guide(build(clearOfTheWay(), { lastInterventionTick: 2100 })).length, 1, "clear of the way: guidance is offered");
   });
 
   test("returns only along a currently supported return route", () => {

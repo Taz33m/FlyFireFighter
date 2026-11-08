@@ -5,12 +5,16 @@
  *
  * Flame height follows Heskestad's correlation L = 0.235 Q^(2/5) − 1.02 D (Q in kW, D in m), clamped to
  * a visible range: a display scaling of heatReleaseKW, not a fire model. Extinguished fires are hidden.
+ *
+ * `fireDisplay` (the exterior smoke plume, fire glow and its light) is audience-only: it lives in the
+ * presentation group, which every drone-camera and thermal render hides (sensor-view.ts).
  */
 import type { Object3D } from "three";
 import { AdditiveBlending, BoxGeometry, ConeGeometry, CylinderGeometry, Group, Mesh, MeshBasicMaterial, MeshLambertMaterial, PointLight, SpotLight, Vector3 } from "three";
 import type { ActuatorCommand } from "../contracts/actions.ts";
 import { regionBounds } from "../contracts/geometry.ts";
 import type { RenderSnapshot } from "../mission/protocol.ts";
+import { FirePresentation } from "./fire-presentation.ts";
 import type { MaterialLibrary } from "./material-patch.ts";
 
 const UP = new Vector3(0, 1, 0);
@@ -39,6 +43,8 @@ interface Flame {
 export class WorldEffects {
   readonly physical = new Group();
   readonly presentation = new Group();
+  /** Audience-only plume and glow; updated from display frames by the twin renderer, never for captures. */
+  readonly fireDisplay = new FirePresentation();
   private readonly flames = new Map<string, Flame>();
   private readonly flameGeometry = new ConeGeometry(1, 1, 20, 1, true).translate(0, 0.5, 0);
   private readonly outerMaterial = new MeshBasicMaterial({ color: 0xff7a1a, transparent: true, opacity: 0.75, blending: AdditiveBlending, depthWrite: false });
@@ -69,7 +75,7 @@ export class WorldEffects {
     this.beam = new Mesh(this.beamGeometry, this.beamMaterial);
     this.beam.visible = false;
     this.physical.add(this.fireLight, this.jet, this.spot, this.spot.target);
-    this.presentation.add(this.beam);
+    this.presentation.add(this.beam, this.fireDisplay.object);
   }
 
   private flame(id: string): Flame {
@@ -169,6 +175,7 @@ export class WorldEffects {
     for (const resource of [this.flameGeometry, this.outerMaterial, this.coreMaterial, this.jetGeometry, this.jetMaterial, this.beamGeometry, this.beamMaterial, this.boxGeometry, this.obstacleMaterial]) resource.dispose();
     this.fireLight.dispose();
     this.spot.dispose();
+    this.fireDisplay.dispose();
     this.physical.removeFromParent();
     this.presentation.removeFromParent();
     this.flames.clear();

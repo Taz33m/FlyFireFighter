@@ -17,6 +17,7 @@ import { DroneCamera } from "./drone-camera.ts";
 import { MaterialLibrary } from "./material-patch.ts";
 import type { AssetState, StaticView } from "./scene-assets.ts";
 import { SceneAssets } from "./scene-assets.ts";
+import { presentationRoots, withRootsHidden } from "./sensor-view.ts";
 import { SmokeField } from "./smoke-field.ts";
 import type { CameraFocus, CameraMode, ScreenLabel } from "./view-cameras.ts";
 import { LabelLayer, NO_CUT, ViewCameras } from "./view-cameras.ts";
@@ -122,6 +123,7 @@ export class TwinRenderer {
     this.drone = new DroneActor(this.materials);
     this.occupants = new OccupantActors(this.materials);
     this.effects = new WorldEffects(this.materials);
+    this.effects.fireDisplay.setClippingPlanes([this.clip]);
     this.scene.add(this.assets.root, this.drone.object, this.occupants.object, this.effects.physical, this.effects.presentation, this.overlays.object);
     this.cameras = new ViewCameras(this.canvas, this.clip, this.reducedMotion);
     this.labels = new LabelLayer(elements.labels);
@@ -151,6 +153,7 @@ export class TwinRenderer {
   load(baseUrl: string): void {
     void this.assets.load(baseUrl, () => {
       this.cameras.setMeta(this.assets.meta);
+      this.effects.fireDisplay.setMeta(this.assets.meta);
       if (this.assets.droneTemplate !== null) this.drone.useTemplate(this.assets.droneTemplate);
       this.renderer.shadowMap.needsUpdate = true;
       this.emitStatus();
@@ -218,17 +221,17 @@ export class TwinRenderer {
     this.effects.update(snapshot, timeS, animate);
   }
 
-  /** Physical scene only: no aircraft body (the lens is inside it), no cutaway, no presentation overlays. */
+  /**
+   * Physical scene only: no aircraft body (the lens is inside it), no cutaway, no presentation overlays,
+   * no fire glow or exterior smoke plume (see sensor-view.ts).
+   */
   private withSensorView<T>(output: "sensor" | "display", draw: () => T): T {
-    const hidden: Object3D[] = [this.drone.object, this.effects.presentation, this.overlays.object].filter(o => o.visible);
     const cut = this.clip.constant;
-    hidden.forEach(o => { o.visible = false; });
     this.clip.constant = NO_CUT;
     this.smoke.setOutput(output);
     try {
-      return draw();
+      return withRootsHidden(presentationRoots({ drone: this.drone.object, effects: this.effects, overlays: this.overlays.object }), draw);
     } finally {
-      hidden.forEach(o => { o.visible = true; });
       this.clip.constant = cut;
       this.smoke.setOutput("display");
     }
@@ -237,12 +240,15 @@ export class TwinRenderer {
   private readonly frame = (now: number) => {
     this.raf = requestAnimationFrame(this.frame);
     if (this.contextLost || now - this.lastFrame < FRAME_MS - 2) return;
+    const dtS = (now - this.lastFrame) / 1000;
     this.lastFrame = now;
     const snapshot = this.getSnapshot();
     this.applyWorld(snapshot, now / 1000, !this.reducedMotion);
     this.overlays.setView(this.missionView);
     this.overlays.updateTrail(snapshot);
     this.cameras.update(snapshot);
+    // Audience-only smoke plume and fire glow: display frames only, hidden for every sensor render.
+    this.effects.fireDisplay.update(snapshot, dtS, now / 1000, this.cameras.camera, this.reducedMotion);
     const { width, height } = this.size;
     this.renderer.setScissorTest(false);
     this.renderer.setViewport(0, 0, width, height);

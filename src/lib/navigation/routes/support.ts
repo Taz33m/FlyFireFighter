@@ -27,6 +27,9 @@
  *   earlier fire beside the route, and the route still needs the clearing look above (after the intervention,
  *   within the age limit, adequate quality); an observation reporting no flame at a corridor point is such a
  *   look there. A flame detection counts against a look only with intensity above 0.
+ * - DEMO (policy.routeSupportRelaxed): rooms and openings need no fresh evidence (an unobserved opening takes its
+ *   plan state; route rooms need no person-search fraction), and only observations captured after the last
+ *   intervention and within the age limit are cited. Fire on or beside the route is judged exactly as above.
  */
 import type { Tick } from "../../contracts/clock.ts";
 import { secondsFromTicks, ticksFromSeconds } from "../../contracts/clock.ts";
@@ -158,6 +161,11 @@ export function openingSupport(ctx: SupportContext, openingIds: readonly Opening
   const evidenceIds: ObservationId[] = [];
   for (const id of openingIds) {
     const seen = ctx.openings.get(id);
+    if (ctx.policy.routeSupportRelaxed) {
+      // Demo: the latest state (or the plan's) stands; only an observation after the intervention is cited.
+      if (seen && seen.tick >= freshSince(ctx)) evidenceIds.push(seen.observationId);
+      continue;
+    }
     if (!seen) problems.push(`${id} (plan says ${ctx.graph.prior.openings.find(o => o.id === id)?.priorState ?? "unknown"}; not observed)`);
     // A broken pane cannot become intact again: its latest observation stays valid for passability however old
     // (a newer "blocked" observation would replace it as the latest state). It is cited while still fresh.
@@ -182,6 +190,11 @@ export function roomSupport(ctx: SupportContext, roomIds: readonly RoomId[]): Ch
   for (const roomId of roomIds) {
     const coverage = ctx.belief.coverage.find(c => c.roomId === roomId);
     const views = roomViews(ctx, roomId, since);
+    if (ctx.policy.routeSupportRelaxed) {
+      // Demo: no fresh person-search fraction is required; fresh views of the room are still cited.
+      evidenceIds.push(...views);
+      continue;
+    }
     const problem = roomProblem(ctx, roomId, coverage, since, views.length);
     if (problem) problems.push(problem);
     else evidenceIds.push(...views);

@@ -36,7 +36,7 @@ import { assessFireClass } from "../../evidence/fire-class.ts";
 import { roomContaining } from "../../evidence/rooms.ts";
 import { requiredSamples } from "../../harness/coverage.ts";
 import type { PossibleOccupant } from "../../harness/person-clearance.ts";
-import { clearedByLaterLook, isCurrentOccupant, nearestIndex, personClearanceFor, possibleOccupants, requiredPersonDistanceM } from "../../harness/person-clearance.ts";
+import { clearedByLaterLook, guideLeadIndex, isCurrentOccupant, nearestIndex, personClearanceFor, possibleOccupants, requiredPersonDistanceM } from "../../harness/person-clearance.ts";
 import type { BreachSpec } from "../../harness/effects.ts";
 import { affectedRegion, sprayRegion } from "../../harness/effects.ts";
 import type { HarnessContext, HarnessPolicy } from "../../harness/policy.ts";
@@ -136,7 +136,8 @@ const EXIT_APPROACH_M = 0.6;
 const ACCESS_SAMPLE_STEP_M = 0.1;
 /** While a spray cools after a coverage refusal, the aircraft is not sent farther than this from its station. */
 const SPRAY_HOLD_RADIUS_M = 2.0;
-const BREACH_REACH_FRACTION = 0.8;
+/** Demo: the standoff at 60% of the striker reach, so the station the look ends at (within the 0.3 m arrival tolerance) is already within reach less the strike margin. */
+const BREACH_REACH_FRACTION = 0.6;
 /** Suppression standoff: at most 60% of the jet range, and at most 2.5 m, from the aim point. */
 const SPRAY_RANGE_FRACTION = 0.6;
 const MAX_SPRAY_STANDOFF_M = 2.5;
@@ -161,7 +162,8 @@ const JET_SAMPLE_STEP_M = 0.1;
  */
 const SPRAY_SHARE_MARGIN = 0.05;
 const MIN_AIM_DISTANCE_M = 0.05;
-const SUPPRESSION_DOSE_L = 0.3;
+/** DEMO: one decisive spray of about 1 s at the Tender's 0.2 L/s (was 0.3 L); see the fire model's suppression rate. */
+const SUPPRESSION_DOSE_L = 0.2;
 const MIN_SUPPRESSION_DOSE_L = 0.05;
 const WATER_DENSITY_KG_M3 = 1000;
 const GUIDE_DURATION_FACTOR = 2;
@@ -819,6 +821,8 @@ function avoided(ctx: Ctx, p: Vec3): boolean {
 
 /** Openings a stair is worth when counting the way from a window's room toward the rescue: a floor change is a long, smoky transit. */
 export const STAIR_HOPS = 3;
+/** BreachAccess.occupiedBy for a room a report names (no track yet): it ranks like an occupied room. */
+const REPORTED_ROOM = "reported";
 /** The exterior approach is checked to this point on the window's outward normal. */
 const APPROACH_OUT_M = 1.0;
 /** An aircraft position closer than this to a wall (beyond the policy's wall band) is moved out before routing from it. */
@@ -865,11 +869,14 @@ interface AccessContext {
 
 function breachCandidates(ctx: Ctx, notes: Note[]): ProposalCandidate[] {
   const breaker = ctx.profile.modules.glassBreaker;
-  if (breaker === null || !ctx.outside || !interventionPoseSupported(ctx)) return [];
+  if (breaker === null || !ctx.outside) return [];
   let shared: AccessContext | null = null;
   const sharedContext = (): AccessContext => (shared ??= accessContext(ctx));
+  // Looks are observation moves: they stay on offer while the pose is not yet good enough for an intervention (a fast
+  // exterior transit), so the move toward the entry window is not dropped and resumed as the estimate varies.
+  const poseSupported = interventionPoseSupported(ctx);
   const breaches = ctx.prior.openings.flatMap(opening => {
-    const plan = breachPlan(ctx, opening, breaker);
+    const plan = poseSupported ? breachPlan(ctx, opening, breaker) : null;
     if (plan === null) return [];
     const roomName = roomNameOf(ctx, opening.rooms[0]);
     const blocking = occupantNear(ctx, plan.region);
@@ -931,27 +938,30 @@ interface LookOption {
 }
 
 function sizeUpLooks(ctx: Ctx, sharedContext: () => AccessContext, breaker: GlassBreakerSpec, breaches: readonly ProposalCandidate[], notes: Note[]): ProposalCandidate[] {
-  if (breaches.length === 0 || ctx.openEntries.length > 0) return [];
+  // Demo: also before any window has been seen, so the first move goes straight to the best-placed window (its look ends
+  // on the breach standoff and the breach is proposed there) instead of first inspecting rooms from outside.
+  // No look after a strike: the way in is the pane just broken (its next frames show it), not another window.
+  if (ctx.openEntries.length > 0 || ctx.lastInterventionTick !== null) return [];
   // A breach left out of this set (cooling after a refusal) is no alternative to a look.
   const scored = breaches.filter(c => !ctx.omitted.has(c.id)).map(c => ({ candidate: c, score: breachAccessScore(breachAccessOf(c) as BreachAccess) })).sort((a, b) => b.score - a.score || compareText(a.candidate.id, b.candidate.id));
   const best = scored.length > 0 ? scored[0] : null;
   // With every observed breach cooling, a look still has to promise positive access.
   const bestScore = best?.score ?? 0;
   const roomsWithBreach = new Set(breaches.map(c => c.target.roomId));
-  const options: LookOption[] = [];
-  for (const opening of ctx.prior.openings) {
-    if (!awaitingLook(ctx, opening) || roomsWithBreach.has(opening.rooms[0])) continue;
-    const id = candidateId("inspect_room", opening.rooms[0], opening.id);
-    const view = ctx.omitted.has(id) ? null : windowViewpoint(ctx, opening);
-    const geometry = view === null ? null : breachGeometry(ctx, opening, breaker);
-    if (view === null || geometry === null || occupantNear(ctx, geometry.region) !== null) continue;
-    const access = breachAccess(ctx, sharedContext(), opening, geometry);
-    const score = unconfirmedAccessScore(access);
-    if (score > bestScore) options.push({ opening, access, score, view, id });
-  }
-  options.sort((a, b) => b.score - a.score || distance(ctx.pose, a.view.goal) - distance(ctx.pose, b.view.goal) || compareText(a.id, b.id));
+  const options = ctx.prior.openings.flatMap(opening => {
+    // A window seen closed whose breach is not on offer yet (the pose does not support an intervention) keeps its look.
+    if (!(awaitingLook(ctx, opening) || seenClosed(ctx, opening)) || roomsWithBreach.has(opening.rooms[0])) return [];
+    const option = lookOption(ctx, sharedContext, breaker, opening);
+    return option !== null && option.score > bestScore ? [option] : [];
+  });
+  // Equal access: the window the aircraft reaches sooner along its exterior route (not in a straight line through the house).
+  const routeS = new Map(options.map(option => [option.id, approachDurationS(ctx, option.opening)]));
+  const soonest = (option: LookOption) => routeS.get(option.id) ?? Infinity;
+  options.sort((a, b) => b.score - a.score || soonest(a) - soonest(b) || distance(ctx.pose, a.view.goal) - distance(ctx.pose, b.view.goal) || compareText(a.id, b.id));
   const rooms = new Set<RoomId>();
-  const chosen = options.filter(option => {
+  // Glass stays out of a reported or occupied room while a window into another room is worth a look.
+  const elsewhere = options.some(option => option.access.occupiedBy === null);
+  const chosen = options.filter(option => (!elsewhere || option.access.occupiedBy === null)).filter(option => {
     if (rooms.has(option.opening.rooms[0]) || rooms.size >= MAX_LOOKS) return false;
     rooms.add(option.opening.rooms[0]);
     return true;
@@ -963,6 +973,39 @@ function sizeUpLooks(ctx: Ctx, sharedContext: () => AccessContext, breaker: Glas
     notes.push({ candidateId: look.id, text: `Size-up: look at window ${label(option.opening.id)} of ${roomNameOf(ctx, option.opening.rooms[0])} before choosing where to break in: ${against}.` });
     return [look];
   });
+}
+
+/**
+ * A look at a window taken from its breach standoff, facing the pane: arriving there is the look, and the breach
+ * (offered once the pane is seen closed) is proposed from where the aircraft already is. Null when the window has no
+ * viewpoint or breach geometry, the look is left out of this set, or a possible occupant is near its debris region.
+ */
+function lookOption(ctx: Ctx, sharedContext: () => AccessContext, breaker: GlassBreakerSpec, opening: PriorOpening): LookOption | null {
+  const id = candidateId("inspect_room", opening.rooms[0], opening.id);
+  const geometry = ctx.omitted.has(id) || windowViewpoint(ctx, opening) === null ? null : breachGeometry(ctx, opening, breaker);
+  if (geometry === null || occupantNear(ctx, geometry.region) !== null) return null;
+  const view: Viewpoint = { goal: geometry.standoff, lookAt: geometry.strike, via: `from the breach standoff of window ${label(opening.id)}` };
+  const access = breachAccess(ctx, sharedContext(), opening, geometry);
+  return { opening, access, score: unconfirmedAccessScore(access), view, id };
+}
+
+/** Estimated flight time along the exterior route to the point APPROACH_OUT_M in front of the window; Infinity without one. */
+function approachDurationS(ctx: Ctx, opening: PriorOpening): number {
+  const normal = horizontalUnit(opening.outwardNormal);
+  if (ctx.start === null || normal === null) return Infinity;
+  const point = add(opening.center, scale(normal, APPROACH_OUT_M));
+  const route = assessRoute(
+    { belief: ctx.belief, tick: ctx.now, lastInterventionTick: ctx.lastInterventionTick, policy: ctx.policy },
+    { id: `look-approach-${opening.id}`, purpose: "return", from: ctx.start, destination: { kind: "point", point }, traveler: "drone", speedMps: ctx.speedMps },
+  );
+  return route.status === "unsupported" || route.waypoints.length === 0 ? Infinity : route.estimatedDurationS;
+}
+
+/** An exterior window last seen closed, recently enough to cite. */
+function seenClosed(ctx: Ctx, opening: PriorOpening): boolean {
+  if (opening.kind !== "window" || opening.rooms[1] !== "exterior" || !ctx.rooms.has(opening.rooms[0])) return false;
+  const evidence = ctx.latestOpening.get(opening.id);
+  return evidence !== undefined && evidence.state === "closed" && evidence.tick >= freshFrom(ctx) && ctx.citable.has(evidence.observationId);
 }
 
 /** An exterior window whose state has not been observed recently enough to cite (and not last seen blocked). */
@@ -1086,12 +1129,20 @@ function breachAccess(ctx: Ctx, shared: AccessContext, opening: PriorOpening, pl
     via: way?.via ?? [],
     closedIn,
     closedOpeningIds: links.filter(link => !link.passable).map(link => link.via),
-    occupiedBy: shared.occupied.get(roomId) ?? null,
+    occupiedBy: occupantOf(ctx, shared, roomId),
     approach: ctx.start === null ? null : exteriorApproach(ctx, opening, ctx.start),
     visibleFraction: visible,
     clearsCoverage: visible >= ctx.policy.breachMinCoverageFraction,
     apertureFit: roundTo(clearance > 0 ? clamp01((minSide - ctx.profile.spanM) / clearance) : minSide > ctx.profile.spanM ? 1 : 0, 1000),
   };
+}
+
+/**
+ * Demo: a room a report names counts like an occupied one (glass kept out while another entry serves), so the first
+ * entry is not the window whose debris would reach the reported person once they are seen.
+ */
+function occupantOf(ctx: Ctx, shared: AccessContext, roomId: RoomId): TrackId | null {
+  return shared.occupied.get(roomId) ?? (ctx.reportedRooms.has(roomId) ? REPORTED_ROOM : null);
 }
 
 /** Interior openings (route-assessor drone passability) and stairs between prior rooms, both ways. */
@@ -1313,7 +1364,8 @@ function trackRoomId(ctx: Ctx, track: OccupantTrack): RoomId | null {
 /** Short phrase for the description: where entering through this window leads (the rationale says why). */
 function accessPhrase(ctx: Ctx, access: BreachAccess): string {
   const parts: string[] = [];
-  if (access.occupiedBy !== null) parts.push(`possible occupant ${label(access.occupiedBy)} inside`);
+  if (access.occupiedBy === REPORTED_ROOM) parts.push("a report names this room");
+  else if (access.occupiedBy !== null) parts.push(`possible occupant ${label(access.occupiedBy)} inside`);
   else if (access.closedIn) parts.push(access.closedOpeningIds.length > 0 ? "only closed doors lead on" : "no interior opening leads on");
   else if (access.hopsToTarget === null || access.targetRoomId === null) parts.push("no open way on");
   else if (access.hopsToTarget === 0) parts.push(`the ${access.targetReason ?? "target"} room`);
@@ -1326,7 +1378,8 @@ function accessPhrase(ctx: Ctx, access: BreachAccess): string {
 /** Plain sentences for the rationale. */
 function accessSentences(ctx: Ctx, roomName: string, access: BreachAccess): string {
   const out: string[] = [];
-  if (access.occupiedBy !== null) out.push(`Possible occupant ${label(access.occupiedBy)} is in ${roomName}; glass is kept out of an occupied room while another entry serves.`);
+  if (access.occupiedBy === REPORTED_ROOM) out.push(`A report names ${roomName}; glass is kept out of it while another entry serves.`);
+  else if (access.occupiedBy !== null) out.push(`Possible occupant ${label(access.occupiedBy)} is in ${roomName}; glass is kept out of an occupied room while another entry serves.`);
   if (access.closedIn) out.push(closedInSentence(roomName, access));
   else if (access.hopsToTarget === 0) out.push(`${roomName} is the ${access.targetReason ?? "target"} room.`);
   else if (access.hopsToTarget !== null && access.targetRoomId !== null) out.push(`${roomName} leads to ${roomNameOf(ctx, access.targetRoomId)} (${access.targetReason ?? "target"}) through ${access.via.map(label).join(", ")}.`);
@@ -1346,7 +1399,8 @@ function accessNotes(ctx: Ctx, opening: PriorOpening, roomName: string, access: 
   const window = `Window ${label(opening.id)} into ${roomName} ranks low:`;
   const notes: string[] = [];
   if (access.closedIn) notes.push(`${window} ${closedInSentence(roomName, access)}`);
-  if (access.occupiedBy !== null) notes.push(`${window} possible occupant ${label(access.occupiedBy)} is in that room; glass is kept out of an occupied room while another entry serves.`);
+  if (access.occupiedBy === REPORTED_ROOM) notes.push(`${window} a report names that room; glass is kept out of it while another entry serves.`);
+  else if (access.occupiedBy !== null) notes.push(`${window} possible occupant ${label(access.occupiedBy)} is in that room; glass is kept out of an occupied room while another entry serves.`);
   if (access.approach === false) notes.push(`${window} no exterior approach to it was found in the floor-plan prior.`);
   if (access.apertureFit < TIGHT_FIT) notes.push(`${window} its ${fmt(Math.min(opening.widthM, opening.heightM))} m pane leaves the ${fmt(ctx.profile.spanM)} m aircraft less than half its obstacle clearance on each side.`);
   return notes;
@@ -1877,6 +1931,10 @@ function guideCandidates(ctx: Ctx): ProposalCandidate[] {
     const route = nearestRouteStart(routes, track.position);
     const maxDurationTicks = guideDurationTicks(ctx, route);
     if (maxDurationTicks === null) return [];
+    // DEMO: never start guidance with the aircraft on the person's way out (the occupant walked into it at the
+    // spray standoff): move off it first.
+    const clearFirst = standClearBeforeGuiding(ctx, track, route);
+    if (clearFirst !== null) return [clearFirst];
     const description = `Guide possible occupant ${label(track.id)} along evacuation route ${label(route.id)} (supported, assessed ${ageText(ctx, route.assessedTick)} ago) with ${cues}.`;
     return [build(ctx, {
       id: candidateId("guide_to_exit", track.id, route.id),
@@ -1887,6 +1945,43 @@ function guideCandidates(ctx: Ctx): ProposalCandidate[] {
       action: { kind: "guide", trackId: track.id, routeId: route.id, templateIds, maxDurationTicks },
       cited: cite(ctx, route.evidenceIds),
     })];
+  });
+}
+
+/** Guidance starts only with the aircraft at least this far (horizontally, same floor) from the person's remaining route. */
+const GUIDE_WAY_CLEAR_M = 1.5;
+/** A stand-clear station before guidance keeps this much more than GUIDE_WAY_CLEAR_M from that route. */
+const GUIDE_WAY_STATION_MARGIN_M = 0.3;
+
+/**
+ * When the aircraft is within GUIDE_WAY_CLEAR_M of the occupant's remaining route (from the occupant along the route
+ * from guideLeadIndex on), a move to the nearest station off it (ring search around the aircraft, the stand-clear
+ * checks: clear of walls, the guidance clearance from people, reachable by a clear way) before guidance is offered.
+ * Null when the aircraft is already clear, or when no such station exists (guidance is then offered as before).
+ */
+function standClearBeforeGuiding(ctx: Ctx, track: OccupantTrack, route: RouteAssessment): ProposalCandidate | null {
+  const way = [track.position, ...route.waypoints.slice(guideLeadIndex(route.waypoints, track, ctx.harness))];
+  const offM = pathDistanceM(way, ctx.pose);
+  if (!(offM < GUIDE_WAY_CLEAR_M)) return null;
+  const needM = GUIDE_WAY_CLEAR_M + GUIDE_WAY_STATION_MARGIN_M;
+  const cost = (p: Vec3) => horizontalDistance(ctx.pose, p) + (overFloor(ctx, p) ? 0 : NO_FLOOR_PENALTY_M);
+  const station = ringPoints(ctx.pose, track.position)
+    .filter(p => pathDistanceM(way, p) >= needM && stationClear(ctx, p, roomContaining(ctx.prior, p)) && occupantTooClose(ctx, p, "guide") === null)
+    .map((p, order) => ({ p, order, cost: cost(p) }))
+    .sort((a, b) => a.cost - b.cost || a.order - b.order)
+    .slice(0, STAND_CLEAR_MAX_TRIES)
+    .find(entry => ctx.reachable(entry.p) && accessClear(ctx, ctx.pose, entry.p))?.p ?? null;
+  if (station === null) return null;
+  const room = roomContaining(ctx.prior, station);
+  const description = `Before guiding possible occupant ${label(track.id)}: move off their way out (now ${fmt(offM)} m from it) to a station ${fmt(pathDistanceM(way, station))} m from it, then guide along route ${label(route.id)}.`;
+  return build(ctx, {
+    id: candidateId("investigate_signal", track.id, STAND_CLEAR_SUFFIX),
+    tool: "investigate_signal",
+    description,
+    rationale: `${description} Guidance never starts with the aircraft on the person's path. Moving changes nothing else.`,
+    target: target({ roomId: room?.id ?? null, trackId: track.id, routeId: route.id, station, focus: round3(track.position), evidenceTick: track.lastSeenTick }),
+    action: moveTo(ctx, station),
+    cited: cite(ctx, track.observationIds),
   });
 }
 

@@ -132,10 +132,15 @@ describe("local planner: Troy main scenario breach selection", () => {
     assert.deepEqual([study?.hopsToTarget, study?.targetRoomId, study?.targetReason], [1, "room-u-hall", "fire"]);
   });
 
-  test("before any occupant is detected, the reported rear bedroom's windows rank first", () => {
+  // DEMO: a room a report names now ranks like an occupied one for glass (kept out while another entry serves), so even
+  // before anyone is detected the study windows off the upstairs hall rank first; the rear bedroom's windows are still
+  // offered, below them. Before, the reported room's windows ranked first and the east one was then excluded once the
+  // occupant was seen within its debris region's margin.
+  test("before any occupant is detected, the study windows rank above the reported rear bedroom's", () => {
     const belief = troyBelief({ tracks: [] });
     const order = rankedBreaches(rankCandidates(troySet(belief), belief, DEFAULT_POLICY));
-    assert.deepEqual(new Set(order.slice(0, 2)), new Set(["request_breach:win-u-rear-bedroom", "request_breach:win-u-rear-bedroom-east"]), order.join(", "));
+    assert.deepEqual(new Set(order.slice(0, 2)), new Set(studyWindows), order.join(", "));
+    for (const id of ["request_breach:win-u-rear-bedroom", "request_breach:win-u-rear-bedroom-east"]) assert.ok(order.indexOf(id) > 1, `${id} in ${order.join(", ")}`);
   });
 
   /*

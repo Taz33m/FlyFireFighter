@@ -95,13 +95,21 @@ The renderer's technique (a fixed 320 × 240 vocabulary of calm, full-screen sta
   - The main filesystem (`h\x\l /`) holds `settings.txt`, `scripts`, `data` and `radio`. It has no `/images`.
 - **Not yet verified:** that a physical press shows up in `g\u` and `[*button]` with the expected column (the order comes from OneWili's `owGUIButton` enum). The device was left showing `STANDBY`.
 
-## Full screens on the device
+## Full screens on the device (legacy FREE-WILi firmware v54)
 
-Showing the designed screens on the device itself needs firmware that can draw them. None of these options was taken; each needs the user's decision.
+On November 8, 2026 the user reflashed the board by hand to LIFELINE's legacy firmware: flash_nuke, then DisplayCPU v54, then MainCPU v54. The files came from the official freewili/freewili-firmware repository at commit 9208bf46 (v54 is not a GitHub release), and their git blob ids were verified. SHA-256: FreeWiliDisplayV54.uf2 `60037880…bbb389`, FreeWiliMainV54.uf2 `d14f7471…e7d80`, flash_nuke.uf2 `f3c3b6a6…ad5b49d`. Returning to OG v024 needs FreeWili OG App Explorer, which is Windows-only, to reinstall the OG display bootloader.
 
-1. **Deprecated FREE-WILi firmware (v54 or `release_v73`).** It shows `.FWI` images from the display's `/images` and accepts file uploads over the display CPU's port. The user's LIFELINE project ran exactly this way: content-addressed images, at most 44, readback-verified, filename-only `show_gui_image`. The release notes warn that converting back loses the OG display bootloader until it is reinstalled. The console would need its legacy transport back (commit bfe66c2) plus the upload, readback and show sequence. `console/fwi.ts` already encodes `.FWI` byte-for-byte as the official converter does, and `render.ts` already produces the 320 × 240 frames.
-2. **A custom FreeWili OG app built with wiliOGbsp,** like the "mutuals" badge. A display-CPU app draws the console screens natively (LVGL) and takes a small state protocol over USB serial. The countdown and coverage update on the device without uploads. This needs the Pico SDK toolchain and an App Explorer flash.
-3. **Stay on v024:** the device line plus the full screen in the app. This is what is implemented.
+**How it works.** Connect the console to the **DisplayCPU** port. The session identifies "DisplayCPU v54" and switches to images. OG v024's MAIN "Board CDC" still gets the one-line text, chosen automatically by identity.
+
+- At connect it installs a fixed set of 16 full screens, content-addressed `/images/FF<6 hex>.FWI` (8.3 names), in priority order. The three decision templates (BREAK GLASS, SPRAY WATER, RELEASE PAYLOAD) go first and are read back byte for byte. Then standby, approved, rejected, aborted, no run and the eight phase screens follow; for these the firmware's own CRC check is trusted. The app shows "Loading console screens n/16".
+- A waiting decision shows its kind's template at once (one image command, about 44 ms). Its acknowledgement confirms the decision for console approval, like the v024 line. The digest binding stays with the action card and the approval builders. The template carries no per-proposal numbers; the full card stays in the app's mirror.
+- Until a screen is installed, the device shows its text line instead.
+- Shows are rate-limited (5/s, 1/s if slow), and repeated after any button edge, because the firmware's own GUI also reacts to buttons.
+- Buttons come from the legacy read-buttons command and button events.
+
+Measured on the board: upload 4.5 s, readback 4.0 s, show 44 ms per 153,624-byte screen. Every legacy command starts with Ctrl-B; without it, a menu stays in its last submenu.
+
+**Allowlist on v54:** identify, button reads and button events, show text, reset display, upload, readback and show of `FF??????.FWI` in `/images` only. Nothing is deleted. Payload bytes are written only after the firmware's "Send File Now" frame.
 
 ## What is implemented and what is not
 

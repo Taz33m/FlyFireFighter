@@ -122,7 +122,8 @@ describe("glass-breaker actuator", () => {
   });
 
   test("a strike out of reach, or one that drift moves off the pane, has no effect", () => {
-    const far = outsideWindow(9.0);
+    // DEMO: the Tender's striker now reaches 1.2 m (it was 0.45 m), so "out of reach" is 1.5 m from the pane.
+    const far = outsideWindow(9.4);
     applyActuatorCommands(far, [strike()]);
     assert.equal(windowTruth(far).state, "closed");
     assert.equal(far.activeColliderIds.has("glass-rear-bedroom"), true);

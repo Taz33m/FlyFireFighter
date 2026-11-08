@@ -49,7 +49,7 @@ describe("frame parsing", () => {
   });
 
   test("malformed or failed button frames are not button levels", () => {
-    for (const raw of ["[*button 0E02 1 0 0 0 0 1]", "[*button 0E02 1 0 0 2 0 0 1]", "[*button 0E02 1 0 0 1 0 0 0]", "[*button zz 1 0 0 1 0 0 1]", "[*button 0E02 -1 0 0 1 0 0 1]"]) {
+    for (const raw of ["[*button 0E02 1 0 0 0 0 1]", "[*button 0E02 1 0 0 G 0 0 1]", "[*button 0E02 1 0 0 1 0 0 0]", "[*button zz 1 0 0 1 0 0 1]", "[*button 0E02 -1 0 0 1 0 0 1]"]) {
       assert.equal(parseFrame(raw)?.type === "buttons", false, raw);
     }
   });

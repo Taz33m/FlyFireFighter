@@ -166,3 +166,32 @@ describe("range-only speed with nothing ahead", () => {
     assert.equal(blind(null).request.velocityBody.x, 0);
   });
 });
+
+describe("smooth-flight options (rangeKnownM, turnSpeedExponent, minPoseSpeedScale)", () => {
+  const c = DEFAULT_COMMAND_CONFIG;
+  const run = (config: typeof c, goal: GoalEstimate, ranges: RangeAssist | null, poseSigmaM = 0.05) =>
+    new ReflexCommandMapper("flow_baseline", config).map({ tick: 10, frame: null, goal, previous: { velocityBody: vec3(0, 0, 0), yawRateRadps: 0 }, quality: { frame: 1, poseSigmaM }, ranges }, { visualConfidence: 1, centering: 0, centeringWeight: 0, loomingRateHz: null, avoidTurn: 0 });
+  const far = { bearingRad: 0, distanceM: 20, heightErrorM: 0 };
+  const open: RangeAssist = { forwardM: null, leftM: 3, rightM: 3, downM: 2 };
+
+  test("by default an unmeasured space ahead is flown at exploration speed; with rangeKnownM a lidar-clear space ahead is cruised", () => {
+    assert.equal(run(c, far, open).request.velocityBody.x, c.exploreSpeedMps);
+    assert.equal(run({ ...c, rangeKnownM: 3 }, far, open).request.velocityBody.x, c.cruiseSpeedMps);
+    // A forward return nearer than rangeKnownM does not count as known; the range brake still limits speed.
+    const near = run({ ...c, rangeKnownM: 3 }, far, { ...open, forwardM: 1.5 });
+    assert.ok(near.request.velocityBody.x <= (1.5 - c.rangeClearanceM) / c.rangeBrakeTimeS + 1e-9);
+  });
+
+  test("turnSpeedExponent 0.5 keeps more speed toward a goal 60° off the nose; a goal abeam is still turned toward in place", () => {
+    const off = { bearingRad: Math.PI / 3, distanceM: 20, heightErrorM: 0 };
+    const stiff = run({ ...c, rangeKnownM: 3 }, off, open).request.velocityBody.x;
+    const smooth = run({ ...c, rangeKnownM: 3, turnSpeedExponent: 0.5 }, off, open).request.velocityBody.x;
+    assert.ok(Math.abs(stiff - 0.5 * c.cruiseSpeedMps) < 1e-9 && Math.abs(smooth - Math.SQRT1_2 * c.cruiseSpeedMps) < 1e-9, `${stiff} ${smooth}`);
+    assert.equal(run({ ...c, turnSpeedExponent: 0.5 }, { bearingRad: Math.PI / 2 + 0.1, distanceM: 20, heightErrorM: 0 }, open).request.velocityBody.x, 0);
+  });
+
+  test("minPoseSpeedScale sets the speed scale at an unreliable pose estimate", () => {
+    const lost = (min: number) => run({ ...c, rangeKnownM: 3, minPoseSpeedScale: min }, far, open, 5).request.velocityBody.x;
+    assert.ok(Math.abs(lost(0.4) - 0.4 * c.cruiseSpeedMps) < 1e-9 && Math.abs(lost(0.75) - 0.75 * c.cruiseSpeedMps) < 1e-9);
+  });
+});

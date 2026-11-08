@@ -71,7 +71,12 @@ export const FIRE_MODEL = Object.freeze({
   decayTauS: 10,
   burnoutTauS: 30,
   burnedOutBelowMJ: 0.01,
-  suppressionKWPerL: 200,
+  /**
+   * DEMO TUNING (was 200): heat release removed per litre that reaches the flame. About a quarter of a jet reaches
+   * a 0.15 m fire from a 1.4–1.6 m standoff, so at 200 kW/L the ~28 kW hall fire took two or three 0.3 L sprays;
+   * at 2000 kW/L about 0.012 L reaching it (well under half of one 1 s, 0.2 L spray) puts it out.
+   */
+  suppressionKWPerL: 2000,
   extinguishBelowKW: 5,
   flameTemperatureC: 800,
   flameExtinctionPerM: 1,

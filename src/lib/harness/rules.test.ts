@@ -730,16 +730,27 @@ describe("coverage margin and detection margin are separate", () => {
 });
 
 describe("coverage thresholds and the standing band", () => {
-  test("spray still needs 95%: a search covering about 90% of the discharge region refuses it", () => {
+  test("under the full rule (95%) a search covering about 90% of the discharge region refuses a spray", () => {
     const partial = box(vec3(6, 0, 3), vec3(9.94, 1.94, 5.6)); // the hallway from 1 m ahead of the nozzle
-    const ctx = makeContext(sprayBelief(T0, { coverageTick: null, extraObservations: [observation("obs-partial", T0 - 5, partial, { modality: "thermal" })] }));
+    const strict = { ...DEFAULT_POLICY, minCoverageFraction: 0.95 };
+    const ctx = makeContext(sprayBelief(T0, { coverageTick: null, extraObservations: [observation("obs-partial", T0 - 5, partial, { modality: "thermal" })] }), { policy: strict });
     const region = affectedRegion(sprayInput().action, TENDER_T1, FLOOR_PLAN);
     assert.ok(region);
     const fraction = coverageOf(region, ctx).fraction;
-    assert.ok(fraction >= DEFAULT_POLICY.breachMinCoverageFraction && fraction < DEFAULT_POLICY.minCoverageFraction, String(fraction));
+    assert.ok(fraction >= DEFAULT_POLICY.breachMinCoverageFraction && fraction < strict.minCoverageFraction, String(fraction));
     const findings = check("submit", sprayInput(), ctx);
     assert.deepEqual(ruleIds(findings), ["H6"]);
     assert.match(findings[0].reason, /95% is required/);
+  });
+
+  test("DEMO 80%: the same 90% search allows the spray, but a possible person in the discharge region still refuses it", () => {
+    const partial = box(vec3(6, 0, 3), vec3(9.94, 1.94, 5.6));
+    const search = observation("obs-partial", T0 - 5, partial, { modality: "thermal" });
+    assert.equal(DEFAULT_POLICY.minCoverageFraction, 0.8);
+    assert.deepEqual(check("submit", sprayInput(), makeContext(sprayBelief(T0, { coverageTick: null, extraObservations: [search] }))), []);
+    const person = personObservation("obs-person-sector", T0 - 3);
+    const refused = check("submit", sprayInput(), makeContext(sprayBelief(T0, { coverageTick: null, extraObservations: [search, person] })));
+    assert.ok(refused.some(f => f.ruleId === "H6" && /Possible person/.test(f.reason)), JSON.stringify(refused));
   });
 
   test("samples more than standing height above the floor are not required, though they lie in the region", () => {
